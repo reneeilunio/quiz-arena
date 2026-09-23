@@ -506,7 +506,7 @@ label{
   <input
     id="joinPin"
     maxlength="6"
-    placeholder=""
+    placeholder="482731"
   >
 
   <label>Nickname</label>
@@ -514,7 +514,7 @@ label{
   <input
     id="nickname"
     maxlength="24"
-    placeholder="Your Full Name"
+    placeholder="Full Name"
   >
 
   <button onclick="joinGame()">
@@ -1325,6 +1325,7 @@ function renderRanking(containerId, players, currentPlayerId=null, showAll=false
 
 async function showHostLeaderboardThenNext(){
 
+  // Prevent duplicate leaderboard/advance cycles.
   if(isAdvancingQuestion) return;
   isAdvancingQuestion = true;
 
@@ -1338,50 +1339,47 @@ async function showHostLeaderboardThenNext(){
 
   renderRanking("hostRanking", players, null, true);
 
-  const nextNumber = currentIndex + 2;
-  const hasNext = nextNumber <= questions.length;
+  const afterQuestion = currentIndex + 1;
+  const hasNext = afterQuestion < questions.length;
 
   $("hostLeaderboardSubtitle").textContent =
     hasNext
-      ? `After Question ${currentIndex + 1}`
+      ? `After Question ${afterQuestion}`
       : "Final standings";
+
+  $("hostLeaderboardCountdown").textContent =
+    hasNext
+      ? `Next question in ${LEADERBOARD_TIME}...`
+      : "Game complete...";
 
   show("hostLeaderboard");
 
-  let remaining = LEADERBOARD_TIME;
-  $("hostLeaderboardCountdown").textContent =
-    hasNext
-      ? `Next question in ${remaining}...`
-      : "Game complete...";
+  // For the final question, there is nothing else to advance to.
+  if(!hasNext){
+    isAdvancingQuestion = false;
+    return;
+  }
 
-  leaderboardInterval = setInterval(() => {
+  let remaining = LEADERBOARD_TIME;
+
+  leaderboardInterval = setInterval(async () => {
+
     remaining--;
 
-    if($("hostLeaderboardCountdown")){
-      $("hostLeaderboardCountdown").textContent =
-        hasNext
-          ? `Next question in ${Math.max(remaining,0)}...`
-          : "Game complete...";
+    const countdown = $("hostLeaderboardCountdown");
+    if(countdown){
+      countdown.textContent = `Next question in ${Math.max(remaining, 0)}...`;
     }
 
     if(remaining <= 0){
       clearLeaderboardTimers();
-    }
-  },1000);
 
-  leaderboardTimeout = setTimeout(async () => {
-    clearLeaderboardTimers();
-
-    isAdvancingQuestion = false;
-
-    if(!hasNext){
-      await finishGame();
-      return;
+      // Move to the next question directly. Do NOT reset the lock here;
+      // nextHostQuestion owns the lock during the database update.
+      await nextHostQuestion(true);
     }
 
-    await nextHostQuestion(true);
-
-  }, LEADERBOARD_TIME * 1000);
+  }, 1000);
 
 }
 
