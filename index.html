@@ -246,6 +246,59 @@ label{
   color:#aeb7d8;
 }
 
+/* LEADERBOARD */
+.leaderboard-title{
+  text-align:center;
+  font-size:38px;
+  margin:0 0 8px;
+}
+.leaderboard-subtitle{
+  text-align:center;
+  color:#aeb7d8;
+  margin-bottom:22px;
+}
+.ranking{
+  display:grid;
+  gap:9px;
+  margin-top:18px;
+}
+.rank-row{
+  display:grid;
+  grid-template-columns:58px 1fr auto;
+  align-items:center;
+  gap:12px;
+  background:#1a2040;
+  border:1px solid #293154;
+  border-radius:12px;
+  padding:13px 16px;
+  font-weight:700;
+}
+.rank-row.you{
+  outline:2px solid #7657ff;
+  background:#222951;
+}
+.rank-number{
+  font-size:22px;
+  text-align:center;
+}
+.rank-name{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.rank-score{
+  font-size:20px;
+}
+.leaderboard-countdown{
+  text-align:center;
+  color:#9da7ca;
+  margin-top:20px;
+}
+@media(max-width:600px){
+  .leaderboard-title{font-size:30px;}
+  .rank-row{grid-template-columns:45px 1fr auto;padding:11px 12px;}
+}
+
 @media(max-width:600px){
 
   .grid,
@@ -418,9 +471,26 @@ label{
     Waiting for players...
   </div>
 
-  <button onclick="nextHostQuestion()">
-    NEXT QUESTION
+  <button onclick="showHostLeaderboardThenNext()">
+    SHOW LEADERBOARD
   </button>
+
+</div>
+
+
+<!-- HOST LEADERBOARD -->
+
+<div class="card hidden" id="hostLeaderboard">
+
+  <div class="leaderboard-title">🏆 Leaderboard</div>
+
+  <div class="leaderboard-subtitle" id="hostLeaderboardSubtitle">
+    Current standings
+  </div>
+
+  <div class="ranking" id="hostRanking"></div>
+
+  <div class="leaderboard-countdown" id="hostLeaderboardCountdown"></div>
 
 </div>
 
@@ -436,7 +506,7 @@ label{
   <input
     id="joinPin"
     maxlength="6"
-    placeholder=""
+    placeholder="482731"
   >
 
   <label>Nickname</label>
@@ -444,7 +514,7 @@ label{
   <input
     id="nickname"
     maxlength="24"
-    placeholder="Your Full Name"
+    placeholder="Full Name"
   >
 
   <button onclick="joinGame()">
@@ -526,6 +596,23 @@ label{
 </div>
 
 
+<!-- PLAYER LEADERBOARD -->
+
+<div class="card hidden" id="playerLeaderboard">
+
+  <div class="leaderboard-title">🏆 Leaderboard</div>
+
+  <div class="leaderboard-subtitle" id="playerLeaderboardSubtitle">
+    Current standings
+  </div>
+
+  <div class="ranking" id="playerRanking"></div>
+
+  <div class="leaderboard-countdown" id="playerLeaderboardCountdown"></div>
+
+</div>
+
+
 <!-- FINISHED -->
 
 <div class="card hidden" id="finished">
@@ -589,9 +676,12 @@ let playerWatcher = null;
 
 // Question timer settings
 const QUESTION_TIME = 10;
+const LEADERBOARD_TIME = 3;
 let hostTimerInterval = null;
 let playerTimerInterval = null;
 let isAdvancingQuestion = false;
+let leaderboardTimeout = null;
+let leaderboardInterval = null;
 
 
 /* =========================================================
@@ -1029,6 +1119,15 @@ function getOptions(q){
    CORRECT ANSWER
 ========================================================= */
 
+function normalizeAnswer(value){
+
+  return String(value ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+}
+
 function getCorrect(q){
 
   return String(
@@ -1038,6 +1137,36 @@ function getCorrect(q){
     q.correct ??
     ""
   ).trim();
+
+}
+
+function isAnswerCorrect(options, selectedIndex, correctValue){
+
+  const selectedText = options[selectedIndex] ?? "";
+  const selectedNorm = normalizeAnswer(selectedText);
+  const correctNorm = normalizeAnswer(correctValue);
+
+  // Normal text comparison: handles capitalization and accidental spaces.
+  if(selectedNorm && correctNorm && selectedNorm === correctNorm){
+    return true;
+  }
+
+  // Also support correct_answer stored as A/B/C/D or 0/1/2/3.
+  const letterIndex = { a:0, b:1, c:2, d:3 };
+  if(Object.prototype.hasOwnProperty.call(letterIndex, correctNorm)){
+    return selectedIndex === letterIndex[correctNorm];
+  }
+
+  if(/^[0-3]$/.test(correctNorm)){
+    return selectedIndex === Number(correctNorm);
+  }
+
+  // Also support 1/2/3/4 storage.
+  if(/^[1-4]$/.test(correctNorm)){
+    return selectedIndex === Number(correctNorm) - 1;
+  }
+
+  return false;
 
 }
 
@@ -1055,9 +1184,24 @@ function clearHostTimer(){
 
 }
 
+function clearLeaderboardTimers(){
+
+  if(leaderboardTimeout){
+    clearTimeout(leaderboardTimeout);
+    leaderboardTimeout = null;
+  }
+
+  if(leaderboardInterval){
+    clearInterval(leaderboardInterval);
+    leaderboardInterval = null;
+  }
+
+}
+
 function startHostTimer(){
 
   clearHostTimer();
+  clearLeaderboardTimers();
 
   let remaining = QUESTION_TIME;
   const el = $("hostTimer");
@@ -1078,7 +1222,7 @@ function startHostTimer(){
 
     if(remaining <= 0){
       clearHostTimer();
-      await nextHostQuestion(true);
+      await showHostLeaderboardThenNext();
     }
 
   }, 1000);
@@ -1106,7 +1250,7 @@ function startPlayerTimer(){
     el.classList.remove("warning");
   }
 
-  playerTimerInterval = setInterval(() => {
+  playerTimerInterval = setInterval(async () => {
 
     remaining--;
 
@@ -1117,9 +1261,154 @@ function startPlayerTimer(){
 
     if(remaining <= 0){
       clearPlayerTimer();
+      answerLocked = true;
+      await showPlayerLeaderboard();
     }
 
   }, 1000);
+
+}
+
+async function fetchLeaderboard(){
+
+  if(!game) return [];
+
+  const { data, error } = await sb
+    .from("players")
+    .select("id,nickname,score")
+    .eq("game_id", game.id)
+    .order("score", { ascending:false })
+    .order("nickname", { ascending:true });
+
+  if(error){
+    console.error("LEADERBOARD ERROR:", error);
+    return [];
+  }
+
+  return data || [];
+
+}
+
+function renderRanking(containerId, players, currentPlayerId=null, showAll=false){
+
+  const el = $(containerId);
+  if(!el) return;
+
+  if(!players.length){
+    el.innerHTML = '<div class="msg">No players yet.</div>';
+    return;
+  }
+
+  const ranking = showAll ? players : players.slice(0,5);
+
+  el.innerHTML = ranking.map((p, index) => {
+
+    const medal =
+      index === 0 ? "🥇" :
+      index === 1 ? "🥈" :
+      index === 2 ? "🥉" :
+      String(index + 1);
+
+    const you = currentPlayerId && p.id === currentPlayerId;
+
+    return `
+      <div class="rank-row ${you ? "you" : ""}">
+        <div class="rank-number">${medal}</div>
+        <div class="rank-name">${esc(p.nickname)}${you ? " <span class=\"small\">(You)</span>" : ""}</div>
+        <div class="rank-score">${p.score ?? 0}</div>
+      </div>
+    `;
+
+  }).join("");
+
+}
+
+async function showHostLeaderboardThenNext(){
+
+  if(isAdvancingQuestion) return;
+  isAdvancingQuestion = true;
+
+  clearHostTimer();
+  clearLeaderboardTimers();
+
+  // Give the final answer/score update a moment to reach Supabase.
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  const players = await fetchLeaderboard();
+
+  renderRanking("hostRanking", players, null, true);
+
+  const nextNumber = currentIndex + 2;
+  const hasNext = nextNumber <= questions.length;
+
+  $("hostLeaderboardSubtitle").textContent =
+    hasNext
+      ? `After Question ${currentIndex + 1}`
+      : "Final standings";
+
+  show("hostLeaderboard");
+
+  let remaining = LEADERBOARD_TIME;
+  $("hostLeaderboardCountdown").textContent =
+    hasNext
+      ? `Next question in ${remaining}...`
+      : "Game complete...";
+
+  leaderboardInterval = setInterval(() => {
+    remaining--;
+
+    if($("hostLeaderboardCountdown")){
+      $("hostLeaderboardCountdown").textContent =
+        hasNext
+          ? `Next question in ${Math.max(remaining,0)}...`
+          : "Game complete...";
+    }
+
+    if(remaining <= 0){
+      clearLeaderboardTimers();
+    }
+  },1000);
+
+  leaderboardTimeout = setTimeout(async () => {
+    clearLeaderboardTimers();
+
+    isAdvancingQuestion = false;
+
+    if(!hasNext){
+      await finishGame();
+      return;
+    }
+
+    await nextHostQuestion(true);
+
+  }, LEADERBOARD_TIME * 1000);
+
+}
+
+async function showPlayerLeaderboard(){
+
+  clearPlayerTimer();
+
+  // Give the player's score update a moment to settle.
+  await new Promise(resolve => setTimeout(resolve, 300));
+
+  const players = await fetchLeaderboard();
+
+  renderRanking("playerRanking", players, player?.id, false);
+
+  const myIndex = players.findIndex(p => p.id === player?.id);
+  const myRank = myIndex >= 0 ? myIndex + 1 : null;
+  const myScore = myIndex >= 0 ? players[myIndex].score : (player?.score ?? 0);
+
+  $("playerLeaderboardSubtitle").textContent =
+    myRank
+      ? `You're #${myRank} with ${myScore} points`
+      : "Current standings";
+
+  $("playerLeaderboardCountdown").textContent =
+    "Waiting for the next question...";
+
+  show("playerLeaderboard");
 
 }
 
@@ -1335,6 +1624,7 @@ async function finishGame(){
 
   clearHostTimer();
   clearPlayerTimer();
+  clearLeaderboardTimers();
 
   if(!game)
     return;
@@ -2010,8 +2300,21 @@ async function submitAnswer(i){
 
 
   const isCorrect =
-    selected === correct ||
-    String(i) === correct;
+    isAnswerCorrect(
+      options,
+      i,
+      correct
+    );
+
+  console.log(
+    "ANSWER CHECK:",
+    {
+      selectedIndex: i,
+      selectedAnswer: selected,
+      correctAnswer: correct,
+      isCorrect
+    }
+  );
 
 
   const points =
