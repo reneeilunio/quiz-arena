@@ -1319,6 +1319,8 @@ async function nextHostQuestion(fromTimer = false){
 
   game = data;
 
+  // Allow the next automatic/manual advance.
+  isAdvancingQuestion = false;
 
   hostShowQuestion();
 
