@@ -1024,6 +1024,10 @@ function hostShowQuestion(){
   currentQuestion =
     questions[currentIndex];
 
+  // Switch the host from the lobby to the live question screen.
+  // This was missing, which left the host visually stuck in Waiting Room
+  // even though the game status had already changed to Playing.
+  show("hostQuestion");
 
   $("hostQCount").textContent =
     "Question " +
