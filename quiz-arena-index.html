@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz Arena</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#070a18;color:#fff;min-height:100vh}.wrap{max-width:900px;margin:auto;padding:28px 18px}.card{background:#11162d;border:1px solid #293154;border-radius:18px;padding:30px;box-shadow:0 20px 60px #0005}h1{font-size:46px;letter-spacing:2px;text-align:center;margin:10px 0 4px}.sub{text-align:center;color:#9da7ca;margin-bottom:28px}button{border:0;border-radius:10px;padding:13px 18px;font-weight:700;cursor:pointer;background:#7657ff;color:#fff;width:100%;margin-top:10px}button.secondary{background:#252c52}button:disabled{opacity:.55;cursor:not-allowed}input{width:100%;padding:14px;border-radius:10px;border:1px solid #394264;background:#090d20;color:#fff;font-size:16px;margin:6px 0 10px}label{font-size:13px;color:#aeb7d8}.hidden{display:none!important}.center{text-align:center}.pin{font-size:58px;letter-spacing:8px;font-weight:800;text-align:center;margin:18px 0}.players{display:grid;gap:8px;margin-top:18px}.player{background:#1a2040;padding:12px 15px;border-radius:10px;display:flex;justify-content:space-between}.msg{padding:12px;background:#191f3c;border-radius:10px;color:#cbd3f3;margin:12px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.option{text-align:left;background:#242c53;border:1px solid #394264}.correct{background:#17734d!important}.wrong{background:#9b3048!important}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.small{font-size:13px;color:#aeb7d8}.score{font-size:34px;font-weight:800;text-align:center}@media(max-width:600px){.grid{grid-template-columns:1fr}h1{font-size:36px}.pin{font-size:44px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="card" id="home">
+<h1>QUIZ ARENA</h1>
+<div class="sub">Account Recovery Training · 10 Questions</div>
+<button onclick="show('hostSetup')">Host a Game</button>
+<button class="secondary" onclick="show('join')">Join a Game</button>
+</div>
+
+<div class="card hidden" id="hostSetup">
+<h2>Host a Game</h2>
+<label>Quiz ID</label><input id="quizId" type="number" value="1" min="1">
+<button onclick="createGame()">Create Game</button>
+<button class="secondary" onclick="show('home')">Back</button>
+<div id="hostSetupMsg"></div>
+</div>
+
+<div class="card hidden" id="hostLobby">
+<div class="top"><h2>Waiting Room</h2><span class="small">Quiz ID: <b id="hostQuizId"></b></span></div>
+<div class="small">GAME PIN</div><div class="pin" id="hostPin"></div>
+<div class="small">Players</div><div class="players" id="hostPlayers"></div>
+<button onclick="startGame()">START GAME</button>
+<button class="secondary" onclick="location.reload()">End Game</button>
+<div id="hostMsg"></div>
+</div>
+
+<div class="card hidden" id="hostQuestion">
+<div class="top"><h2>Live Game</h2><span class="small" id="hostQCount"></span></div>
+<h2 id="hostQuestionText"></h2>
+<div id="hostOptions" class="grid"></div>
+<div class="msg" id="hostAnswers">Waiting for players...</div>
+<button onclick="nextHostQuestion()">NEXT QUESTION</button>
+</div>
+
+<div class="card hidden" id="join">
+<h2>Join a Game</h2>
+<label>Game PIN</label><input id="joinPin" maxlength="6" placeholder="482731">
+<label>Nickname</label><input id="nickname" maxlength="24" placeholder="Renee">
+<button onclick="joinGame()">JOIN GAME</button>
+<button class="secondary" onclick="show('home')">Back</button>
+<div id="joinMsg"></div>
+</div>
+
+<div class="card hidden" id="playerLobby">
+<div class="center"><h2>You're in! 🎉</h2><div class="pin" id="playerPin"></div><p class="small">Waiting for the host to start the game...</p></div>
+</div>
+
+<div class="card hidden" id="playerQuestion">
+<div class="top"><h2 id="playerQNumber"></h2><span class="small">Score: <b id="playerScore">0</b></span></div>
+<h2 id="playerQuestionText"></h2>
+<div id="playerOptions"></div>
+<div id="playerMsg"></div>
+</div>
+
+<div class="card hidden" id="finished">
+<div class="center"><h1>GAME COMPLETE</h1><div class="score" id="finalScore"></div><p id="finalText"></p><button onclick="location.reload()">Back to Home</button></div>
+</div>
+
+</div>
+
+<script>
+const SUPABASE_URL="https://ozcjuthexxpctkbknfcs.supabase.co";
+const SUPABASE_KEY="sb_publishable_BxgDOAcICXk48EmmyvBjiQ_oTsvQ_Ax";
+
+let sb,game=null,player=null,questions=[],currentIndex=0,currentQuestion=null,answerLocked=false;
+
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll(".card").forEach(x=>x.classList.add("hidden"));$(id).classList.remove("hidden")}
+function msg(id,text){$(id).innerHTML='<div class="msg">'+text+'</div>'}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+async function init(){
+ const s=document.createElement("script");
+ s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+ document.head.appendChild(s);
+ await new Promise((resolve,reject)=>{s.onload=resolve;s.onerror=reject});
+ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+}
+init().catch(()=>alert("Could not load Supabase. Check your internet connection."));
+
+function randomPin(){return String(Math.floor(100000+Math.random()*900000))}
+
+async function createGame(){
+ const quiz_id=Number($("quizId").value||1),game_pin=randomPin();
+ const {data,error}=await sb.from("games").insert({quiz_id,game_pin,status:"Waiting"}).select().single();
+ if(error){msg("hostSetupMsg","Could not create game: "+esc(error.message));return}
+ game=data;
+ $("hostPin").textContent=game_pin;
+ $("hostQuizId").textContent=quiz_id;
+ show("hostLobby");
+ subscribeToGame();
+ loadPlayers();
+}
+
+async function loadPlayers(){
+ const {data,error}=await sb.from("players").select("*").eq("game_id",game.id).order("created_at");
+ if(error){$("hostPlayers").innerHTML='<div class="msg">'+esc(error.message)+"</div>";return}
+ $("hostPlayers").innerHTML=data?.length
+ ?data.map(p=>'<div class="player"><span>👤 '+esc(p.nickname)+'</span><b>'+(p.score??0)+"</b></div>").join("")
+ :'<div class="msg">Waiting for players...</div>';
+}
+
+function subscribeToGame(){
+ sb.channel("game-"+game.id)
+ .on("postgres_changes",{event:"*",schema:"public",table:"players",filter:"game_id=eq."+game.id},()=>loadPlayers())
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"games",filter:"id=eq."+game.id},payload=>{
+   game=payload.new;
+ })
+ .subscribe();
+}
+
+async function startGame(){
+ const {data,error}=await sb.from("questions").select("*").eq("quiz_id",game.quiz_id).order("id");
+ if(error){msg("hostMsg","Could not load questions: "+esc(error.message));return}
+ questions=data||[];
+ if(!questions.length){msg("hostMsg","No questions found for Quiz ID "+game.quiz_id+". Add questions first.");return}
+ await sb.from("games").update({status:"Playing"}).eq("id",game.id);
+ currentIndex=0;
+ hostShowQuestion();
+}
+
+function getText(q){return q.question_text??q.question??q.text??q.prompt??"Question"}
+function getOptions(q){
+ if(Array.isArray(q.options))return q.options;
+ if(typeof q.options==="string"){try{const x=JSON.parse(q.options);if(Array.isArray(x))return x}catch(e){}}
+ return [q.option_a,q.option_b,q.option_c,q.option_d].filter(x=>x!==undefined&&x!==null);
+}
+function getCorrect(q){return String(q.correct_answer??q.correct_option??q.answer??q.correct??"").trim()}
+
+function hostShowQuestion(){
+ if(currentIndex>=questions.length){finishGame();return}
+ currentQuestion=questions[currentIndex];
+ $("hostQCount").textContent="Question "+(currentIndex+1)+" of "+questions.length;
+ $("hostQuestionText").textContent=getText(currentQuestion);
+ $("hostOptions").innerHTML=getOptions(currentQuestion).map(o=>'<button class="option" disabled>'+esc(o)+"</button>").join("");
+ loadAnswerCount();
+}
+
+async function loadAnswerCount(){
+ const {data}=await sb.from("answers").select("id,player_id,is_correct").eq("game_id",game.id).eq("question_id",currentQuestion.id);
+ const {count}=await sb.from("players").select("id",{count:"exact",head:true}).eq("game_id",game.id);
+ $("hostAnswers").textContent="Answers: "+(data?.length||0)+" / "+(count||0);
+}
+
+function nextHostQuestion(){
+ currentIndex++;
+ hostShowQuestion();
+}
+
+async function finishGame(){
+ await sb.from("games").update({status:"Finished"}).eq("id",game.id);
+ show("finished");
+ $("finalScore").textContent="Game complete!";
+ $("finalText").textContent="Final scores are saved in the players table.";
+}
+
+async function joinGame(){
+ const pin=$("joinPin").value.trim(),nickname=$("nickname").value.trim();
+ if(!pin||!nickname){msg("joinMsg","Enter both the game PIN and a nickname.");return}
+ const {data:g,error}=await sb.from("games").select("*").eq("game_pin",pin).maybeSingle();
+ if(error||!g){msg("joinMsg","Game not found. Check the PIN.");return}
+ if(g.status!=="Waiting"){msg("joinMsg","That game has already started or ended.");return}
+ const {data:p,error:e}=await sb.from("players").insert({game_id:g.id,nickname,score:0,streak:0}).select().single();
+ if(e){msg("joinMsg","Could not join: "+esc(e.message));return}
+ game=g;player=p;
+ $("playerPin").textContent=pin;
+ show("playerLobby");
+
+ sb.channel("player-game-"+g.id)
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"games",filter:"id=eq."+g.id},payload=>{
+   game=payload.new;
+   if(game.status==="Playing")loadPlayerQuestions();
+   if(game.status==="Finished")show("finished");
+ })
+ .subscribe();
+}
+
+async function loadPlayerQuestions(){
+ const {data,error}=await sb.from("questions").select("*").eq("quiz_id",game.quiz_id).order("id");
+ if(error||!data?.length){msg("playerLobby","No questions are available for this quiz.");return}
+ questions=data;currentIndex=0;showPlayerQuestion();
+}
+
+function showPlayerQuestion(){
+ if(currentIndex>=questions.length){
+   show("finished");
+   $("finalScore").textContent="Thanks for playing!";
+   return;
+ }
+ currentQuestion=questions[currentIndex];
+ answerLocked=false;
+ const opts=getOptions(currentQuestion);
+ $("playerQNumber").textContent="Question "+(currentIndex+1)+" of "+questions.length;
+ $("playerQuestionText").textContent=getText(currentQuestion);
+ $("playerScore").textContent=player.score??0;
+ $("playerOptions").innerHTML=opts.map((o,i)=>'<button class="option" onclick="submitAnswer('+i+')">'+esc(o)+"</button>").join("");
+ $("playerMsg").innerHTML="";
+}
+
+async function submitAnswer(i){
+ if(answerLocked)return;
+ answerLocked=true;
+
+ const opts=getOptions(currentQuestion),selected=String(opts[i]),correct=getCorrect(currentQuestion);
+ const isCorrect=selected===correct||String(i)===correct;
+ const points=isCorrect?10:0;
+
+ const {error}=await sb.from("answers").insert({
+   question_id:currentQuestion.id,
+   selected_answer:selected,
+   is_correct:isCorrect,
+   game_id:game.id,
+   player_id:player.id,
+   response_time:0,
+   points
+ });
+
+ if(error){
+   $("playerMsg").innerHTML='<div class="msg">Could not save answer: '+esc(error.message)+"</div>";
+   answerLocked=false;
+   return;
+ }
+
+ const newScore=(player.score||0)+points;
+ player.score=newScore;
+ await sb.from("players").update({score:newScore,streak:isCorrect?(player.streak||0)+1:0}).eq("id",player.id);
+
+ document.querySelectorAll("#playerOptions button").forEach((b,j)=>{
+   b.disabled=true;
+   if(j===i)b.classList.add(isCorrect?"correct":"wrong");
+ });
+ $("playerMsg").innerHTML='<div class="msg">'+(isCorrect?"✅ Correct! +10 points":"❌ Not quite. +0 points")+"</div>";
+
+ setTimeout(()=>{currentIndex++;showPlayerQuestion()},900);
+}
+</script>
+</body>
+</html>
