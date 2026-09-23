@@ -150,6 +150,27 @@ label{
   text-align:center;
 }
 
+/* QUESTION TIMER */
+
+.timer{
+  min-width:72px;
+  text-align:center;
+  font-size:28px;
+  font-weight:900;
+  background:#191f3c;
+  border-radius:12px;
+  padding:8px 14px;
+}
+
+.timer.warning{
+  animation:pulse .6s infinite alternate;
+}
+
+@keyframes pulse{
+  from{transform:scale(1);}
+  to{transform:scale(1.06);}
+}
+
 /* HOST OPTIONS */
 
 .grid{
@@ -265,7 +286,7 @@ label{
   <h1>QUIZ ARENA</h1>
 
   <div class="sub">
-    Group 2 Barometer · 10 Questions
+    Account Recovery Training · 10 Questions
   </div>
 
   <button onclick="show('hostSetup')">
@@ -367,10 +388,16 @@ label{
 
     <h2>Live Game</h2>
 
-    <span
-      class="small"
-      id="hostQCount"
-    ></span>
+    <div class="top" style="margin-left:auto">
+      <span
+        class="small"
+        id="hostQCount"
+      ></span>
+      <span
+        class="timer"
+        id="hostTimer"
+      >15</span>
+    </div>
 
   </div>
 
@@ -409,7 +436,7 @@ label{
   <input
     id="joinPin"
     maxlength="6"
-    placeholder=""
+    placeholder="482731"
   >
 
   <label>Nickname</label>
@@ -417,7 +444,7 @@ label{
   <input
     id="nickname"
     maxlength="24"
-    placeholder="Your Full Name"
+    placeholder="Full Name"
   >
 
   <button onclick="joinGame()">
@@ -471,9 +498,15 @@ label{
       id="playerQNumber"
     ></div>
 
-    <div class="small">
-      Score:
-      <b id="playerScore">0</b>
+    <div class="top" style="margin-left:auto">
+      <div class="small">
+        Score:
+        <b id="playerScore">0</b>
+      </div>
+      <span
+        class="timer"
+        id="playerTimer"
+      >15</span>
     </div>
 
   </div>
@@ -553,6 +586,12 @@ let currentQuestion = null;
 let answerLocked = false;
 
 let playerWatcher = null;
+
+// Question timer settings
+const QUESTION_TIME = 10;
+let hostTimerInterval = null;
+let playerTimerInterval = null;
+let isAdvancingQuestion = false;
 
 
 /* =========================================================
@@ -1004,6 +1043,87 @@ function getCorrect(q){
 
 
 /* =========================================================
+   QUESTION TIMER
+========================================================= */
+
+function clearHostTimer(){
+
+  if(hostTimerInterval){
+    clearInterval(hostTimerInterval);
+    hostTimerInterval = null;
+  }
+
+}
+
+function startHostTimer(){
+
+  clearHostTimer();
+
+  let remaining = QUESTION_TIME;
+  const el = $("hostTimer");
+
+  if(el){
+    el.textContent = remaining;
+    el.classList.remove("warning");
+  }
+
+  hostTimerInterval = setInterval(async () => {
+
+    remaining--;
+
+    if(el){
+      el.textContent = Math.max(remaining, 0);
+      if(remaining <= 5) el.classList.add("warning");
+    }
+
+    if(remaining <= 0){
+      clearHostTimer();
+      await nextHostQuestion(true);
+    }
+
+  }, 1000);
+
+}
+
+function clearPlayerTimer(){
+
+  if(playerTimerInterval){
+    clearInterval(playerTimerInterval);
+    playerTimerInterval = null;
+  }
+
+}
+
+function startPlayerTimer(){
+
+  clearPlayerTimer();
+
+  let remaining = QUESTION_TIME;
+  const el = $("playerTimer");
+
+  if(el){
+    el.textContent = remaining;
+    el.classList.remove("warning");
+  }
+
+  playerTimerInterval = setInterval(() => {
+
+    remaining--;
+
+    if(el){
+      el.textContent = Math.max(remaining, 0);
+      if(remaining <= 5) el.classList.add("warning");
+    }
+
+    if(remaining <= 0){
+      clearPlayerTimer();
+    }
+
+  }, 1000);
+
+}
+
+/* =========================================================
    HOST SHOW QUESTION
 ========================================================= */
 
@@ -1024,10 +1144,6 @@ function hostShowQuestion(){
   currentQuestion =
     questions[currentIndex];
 
-  // Switch the host from the lobby to the live question screen.
-  // This was missing, which left the host visually stuck in Waiting Room
-  // even though the game status had already changed to Playing.
-  show("hostQuestion");
 
   $("hostQCount").textContent =
     "Question " +
@@ -1056,6 +1172,12 @@ function hostShowQuestion(){
 
 
   loadAnswerCount();
+
+  // Actually switch the host from the lobby to the live question.
+  show("hostQuestion");
+
+  // Automatically move to the next question when time expires.
+  startHostTimer();
 
 }
 
@@ -1119,7 +1241,11 @@ async function loadAnswerCount(){
    NEXT QUESTION
 ========================================================= */
 
-async function nextHostQuestion(){
+async function nextHostQuestion(fromTimer = false){
+
+  if(isAdvancingQuestion) return;
+  isAdvancingQuestion = true;
+  clearHostTimer();
 
   currentIndex++;
 
@@ -1183,6 +1309,8 @@ async function nextHostQuestion(){
     */
 
     currentIndex--;
+    isAdvancingQuestion = false;
+    startHostTimer();
 
     return;
 
@@ -1202,6 +1330,9 @@ async function nextHostQuestion(){
 ========================================================= */
 
 async function finishGame(){
+
+  clearHostTimer();
+  clearPlayerTimer();
 
   if(!game)
     return;
@@ -1257,6 +1388,9 @@ async function finishGame(){
 ========================================================= */
 
 async function endGame(){
+
+  clearHostTimer();
+  clearPlayerTimer();
 
   if(game){
 
@@ -1834,6 +1968,10 @@ function showPlayerQuestion(){
   */
 
   show("playerQuestion");
+
+  // Display a matching countdown for the player.
+  // The host timer is authoritative and advances the shared game.
+  startPlayerTimer();
 
 }
 
