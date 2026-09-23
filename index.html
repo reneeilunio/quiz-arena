@@ -121,13 +121,36 @@ function subscribeToGame(){
 }
 
 async function startGame(){
- const {data,error}=await sb.from("questions").select("*").eq("quiz_id",game.quiz_id).order("id");
- if(error){msg("hostMsg","Could not load questions: "+esc(error.message));return}
- questions=data||[];
- if(!questions.length){msg("hostMsg","No questions found for Quiz ID "+game.quiz_id+". Add questions first.");return}
- await sb.from("games").update({status:"Playing"}).eq("id",game.id);
- currentIndex=0;
- hostShowQuestion();
+  const {data,error}=await sb
+    .from("questions")
+    .select("*")
+    .eq("quiz_id",game.quiz_id)
+    .order("id");
+
+  if(error){
+    msg("hostMsg","Could not load questions: "+esc(error.message));
+    return;
+  }
+
+  questions=data||[];
+
+  if(!questions.length){
+    msg("hostMsg","No questions found for Quiz ID "+game.quiz_id+". Add questions first.");
+    return;
+  }
+
+  const {error:updateError}=await sb
+    .from("games")
+    .update({status:"Playing"})
+    .eq("id",game.id);
+
+  if(updateError){
+    msg("hostMsg","Could not start game: "+esc(updateError.message));
+    return;
+  }
+
+  currentIndex=0;
+  hostShowQuestion();
 }
 
 function getText(q){return q.question_text??q.question??q.text??q.prompt??"Question"}
@@ -139,12 +162,21 @@ function getOptions(q){
 function getCorrect(q){return String(q.correct_answer??q.correct_option??q.answer??q.correct??"").trim()}
 
 function hostShowQuestion(){
- if(currentIndex>=questions.length){finishGame();return}
- currentQuestion=questions[currentIndex];
- $("hostQCount").textContent="Question "+(currentIndex+1)+" of "+questions.length;
- $("hostQuestionText").textContent=getText(currentQuestion);
- $("hostOptions").innerHTML=getOptions(currentQuestion).map(o=>'<button class="option" disabled>'+esc(o)+"</button>").join("");
- loadAnswerCount();
+  if(currentIndex>=questions.length){
+    finishGame();
+    return;
+  }
+
+  show("hostQuestion");
+
+  currentQuestion=questions[currentIndex];
+  $("hostQCount").textContent="Question "+(currentIndex+1)+" of "+questions.length;
+  $("hostQuestionText").textContent=getText(currentQuestion);
+  $("hostOptions").innerHTML=getOptions(currentQuestion)
+    .map(o=>'<button class="option" disabled>'+esc(o)+"</button>")
+    .join("");
+
+  loadAnswerCount();
 }
 
 async function loadAnswerCount(){
