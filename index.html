@@ -4,278 +4,1939 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Quiz Arena</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#070a18;color:#fff;min-height:100vh}.wrap{max-width:900px;margin:auto;padding:28px 18px}.card{background:#11162d;border:1px solid #293154;border-radius:18px;padding:30px;box-shadow:0 20px 60px #0005}h1{font-size:46px;letter-spacing:2px;text-align:center;margin:10px 0 4px}.sub{text-align:center;color:#9da7ca;margin-bottom:28px}button{border:0;border-radius:10px;padding:13px 18px;font-weight:700;cursor:pointer;background:#7657ff;color:#fff;width:100%;margin-top:10px}button.secondary{background:#252c52}button:disabled{opacity:.55;cursor:not-allowed}input{width:100%;padding:14px;border-radius:10px;border:1px solid #394264;background:#090d20;color:#fff;font-size:16px;margin:6px 0 10px}label{font-size:13px;color:#aeb7d8}.hidden{display:none!important}.center{text-align:center}.pin{font-size:58px;letter-spacing:8px;font-weight:800;text-align:center;margin:18px 0}.players{display:grid;gap:8px;margin-top:18px}.player{background:#1a2040;padding:12px 15px;border-radius:10px;display:flex;justify-content:space-between}.msg{padding:12px;background:#191f3c;border-radius:10px;color:#cbd3f3;margin:12px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.option{text-align:left;background:#242c53;border:1px solid #394264}.correct{background:#17734d!important}.wrong{background:#9b3048!important}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.small{font-size:13px;color:#aeb7d8}.score{font-size:34px;font-weight:800;text-align:center}@media(max-width:600px){.grid{grid-template-columns:1fr}h1{font-size:36px}.pin{font-size:44px}}
+*{
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#070a18;
+  --card:#11162d;
+  --card2:#191f3c;
+  --border:#30385f;
+  --text:#fff;
+  --muted:#aeb7d8;
+  --purple:#7657ff;
+
+  --red:#e21b3c;
+  --blue:#1368ce;
+  --yellow:#d89b00;
+  --green:#26890c;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top,#25295b 0,#101226 45%,#070a18 100%);
+  color:var(--text);
+  font-family:Inter,Arial,Helvetica,sans-serif;
+}
+
+.wrap{
+  width:min(1000px,94vw);
+  margin:auto;
+  padding:30px 0;
+}
+
+.card{
+  background:rgba(17,22,45,.97);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:30px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+
+.hidden{
+  display:none!important;
+}
+
+.center{
+  text-align:center;
+}
+
+h1{
+  font-size:52px;
+  font-weight:900;
+  letter-spacing:-2px;
+  text-align:center;
+  margin:10px 0 6px;
+}
+
+h2{
+  margin-top:0;
+}
+
+.sub{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:30px;
+  font-size:17px;
+}
+
+label{
+  display:block;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:12px;
+}
+
+input{
+  width:100%;
+  padding:15px;
+  border-radius:12px;
+  border:1px solid #394264;
+  background:#090d20;
+  color:#fff;
+  font-size:17px;
+  margin:6px 0 10px;
+  outline:none;
+}
+
+input:focus{
+  border-color:var(--purple);
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:15px 20px;
+  margin-top:10px;
+  background:var(--purple);
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.15s;
+}
+
+button:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none;
+}
+
+button.secondary{
+  background:#252c52;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+}
+
+.small{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.pin{
+  text-align:center;
+  font-size:64px;
+  font-weight:900;
+  letter-spacing:10px;
+  margin:20px 0;
+}
+
+.players{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+
+.player{
+  background:#1a2040;
+  border-radius:11px;
+  padding:14px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.msg{
+  background:#191f3c;
+  border-radius:11px;
+  padding:14px;
+  margin-top:14px;
+  color:#d4daf5;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.option{
+  text-align:left;
+  min-height:65px;
+  font-size:17px;
+  background:#242c53;
+  border:2px solid transparent;
+}
+
+.option.red{
+  background:var(--red);
+}
+
+.option.blue{
+  background:var(--blue);
+}
+
+.option.yellow{
+  background:var(--yellow);
+}
+
+.option.green{
+  background:var(--green);
+}
+
+.option.correct{
+  background:#17734d!important;
+  border-color:#fff;
+}
+
+.option.wrong{
+  background:#9b3048!important;
+  border-color:#fff;
+}
+
+.question{
+  font-size:clamp(28px,4vw,42px);
+  line-height:1.15;
+  font-weight:900;
+  text-align:center;
+  margin:30px 0;
+}
+
+.player-question{
+  font-size:clamp(26px,4vw,38px);
+  line-height:1.2;
+  font-weight:900;
+  text-align:center;
+  margin:28px 0;
+}
+
+.answers{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.answer{
+  min-height:100px;
+  border:0;
+  border-radius:16px;
+  color:white;
+  font-size:18px;
+  font-weight:900;
+  padding:20px;
+  cursor:pointer;
+  text-align:left;
+  margin:0;
+}
+
+.answer.red{
+  background:var(--red);
+}
+
+.answer.blue{
+  background:var(--blue);
+}
+
+.answer.yellow{
+  background:var(--yellow);
+}
+
+.answer.green{
+  background:var(--green);
+}
+
+.answer:hover{
+  transform:scale(1.01);
+  filter:brightness(1.08);
+}
+
+.answer:disabled{
+  cursor:default;
+  opacity:.7;
+}
+
+.answer.correct{
+  outline:4px solid white;
+  box-shadow:0 0 0 5px #3ddc84;
+  opacity:1;
+}
+
+.answer.wrong{
+  outline:4px solid white;
+  box-shadow:0 0 0 5px #ff526d;
+}
+
+.score{
+  font-size:42px;
+  font-weight:900;
+  text-align:center;
+}
+
+.status{
+  text-align:center;
+  color:var(--muted);
+  margin-top:15px;
+}
+
+.loading{
+  text-align:center;
+  color:var(--muted);
+  padding:20px;
+}
+
+@media(max-width:650px){
+  .grid,
+  .answers{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:40px;
+  }
+
+  .pin{
+    font-size:45px;
+    letter-spacing:6px;
+  }
+
+  .card{
+    padding:20px;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
 
-<div class="card" id="home">
-<h1>QUiZZiES</h1>
-<div class="sub">Group 2 Barometer · 10 Questions</div>
-<button onclick="show('hostSetup')">Host a Game</button>
-<button class="secondary" onclick="show('join')">Join a Game</button>
+  <!-- HOME -->
+  <div class="card" id="home">
+    <h1>QUIZ ARENA</h1>
+    <div class="sub">
+      Account Recovery Training · Kahoot-style Quiz
+    </div>
+
+    <button onclick="show('hostSetup')">
+      🎤 Host a Game
+    </button>
+
+    <button class="secondary" onclick="show('join')">
+      🎮 Join a Game
+    </button>
+  </div>
+
+
+  <!-- HOST SETUP -->
+  <div class="card hidden" id="hostSetup">
+
+    <h2>Host a Game</h2>
+
+    <label>Quiz ID</label>
+    <input
+      id="quizId"
+      type="number"
+      value="1"
+      min="1"
+    >
+
+    <button onclick="createGame()">
+      CREATE GAME
+    </button>
+
+    <button class="secondary" onclick="show('home')">
+      BACK
+    </button>
+
+    <div id="hostSetupMsg"></div>
+
+  </div>
+
+
+  <!-- HOST LOBBY -->
+  <div class="card hidden" id="hostLobby">
+
+    <div class="top">
+      <h2>Waiting Room</h2>
+
+      <span class="small">
+        Quiz ID:
+        <b id="hostQuizId"></b>
+      </span>
+    </div>
+
+    <div class="small">
+      GAME PIN
+    </div>
+
+    <div class="pin" id="hostPin"></div>
+
+    <div class="small">
+      Players
+    </div>
+
+    <div class="players" id="hostPlayers">
+      <div class="loading">
+        Waiting for players...
+      </div>
+    </div>
+
+    <button id="startButton" onclick="startGame()">
+      START GAME
+    </button>
+
+    <button class="secondary" onclick="endGame()">
+      END GAME
+    </button>
+
+    <div id="hostMsg"></div>
+
+  </div>
+
+
+  <!-- HOST QUESTION -->
+  <div class="card hidden" id="hostQuestion">
+
+    <div class="top">
+      <h2>Live Game</h2>
+
+      <span class="small" id="hostQCount">
+        Question 1
+      </span>
+    </div>
+
+    <div class="question" id="hostQuestionText">
+      Loading...
+    </div>
+
+    <div id="hostOptions" class="grid"></div>
+
+    <div class="msg" id="hostAnswers">
+      Waiting for answers...
+    </div>
+
+    <button
+      id="nextQuestionButton"
+      onclick="nextHostQuestion()"
+    >
+      NEXT QUESTION →
+    </button>
+
+  </div>
+
+
+  <!-- PLAYER JOIN -->
+  <div class="card hidden" id="join">
+
+    <h2>Join a Game</h2>
+
+    <label>Game PIN</label>
+
+    <input
+      id="joinPin"
+      maxlength="6"
+      placeholder="482731"
+    >
+
+    <label>Nickname</label>
+
+    <input
+      id="nickname"
+      maxlength="24"
+      placeholder="Renee"
+    >
+
+    <button onclick="joinGame()">
+      JOIN GAME
+    </button>
+
+    <button class="secondary" onclick="show('home')">
+      BACK
+    </button>
+
+    <div id="joinMsg"></div>
+
+  </div>
+
+
+  <!-- PLAYER LOBBY -->
+  <div class="card hidden" id="playerLobby">
+
+    <div class="center">
+
+      <h2>
+        You're in! 🎉
+      </h2>
+
+      <div class="pin" id="playerPin"></div>
+
+      <p class="small">
+        Waiting for the host to start the game...
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- PLAYER QUESTION -->
+  <div class="card hidden" id="playerQuestion">
+
+    <div class="top">
+
+      <span class="small" id="playerQNumber">
+        Question 1 of 10
+      </span>
+
+      <span class="small">
+        Score:
+        <b id="playerScore">0</b>
+      </span>
+
+    </div>
+
+    <div class="player-question" id="playerQuestionText">
+      Loading...
+    </div>
+
+    <div
+      id="playerOptions"
+      class="answers"
+    ></div>
+
+    <div id="playerMsg"></div>
+
+  </div>
+
+
+  <!-- FINISHED -->
+  <div class="card hidden" id="finished">
+
+    <div class="center">
+
+      <h1>🏆 GAME COMPLETE</h1>
+
+      <div
+        class="score"
+        id="finalScore"
+      ></div>
+
+      <p
+        id="finalText"
+        class="status"
+      ></p>
+
+      <button onclick="location.reload()">
+        BACK TO HOME
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
 
-<div class="card hidden" id="hostSetup">
-<h2>Host a Game</h2>
-<label>Quiz ID</label><input id="quizId" type="number" value="1" min="1">
-<button onclick="createGame()">Create Game</button>
-<button class="secondary" onclick="show('home')">Back</button>
-<div id="hostSetupMsg"></div>
-</div>
-
-<div class="card hidden" id="hostLobby">
-<div class="top"><h2>Waiting Room</h2><span class="small">Quiz ID: <b id="hostQuizId"></b></span></div>
-<div class="small">GAME PIN</div><div class="pin" id="hostPin"></div>
-<div class="small">Players</div><div class="players" id="hostPlayers"></div>
-<button onclick="startGame()">START GAME</button>
-<button class="secondary" onclick="location.reload()">End Game</button>
-<div id="hostMsg"></div>
-</div>
-
-<div class="card hidden" id="hostQuestion">
-<div class="top"><h2>Live Game</h2><span class="small" id="hostQCount"></span></div>
-<h2 id="hostQuestionText"></h2>
-<div id="hostOptions" class="grid"></div>
-<div class="msg" id="hostAnswers">Waiting for players...</div>
-<button onclick="nextHostQuestion()">NEXT QUESTION</button>
-</div>
-
-<div class="card hidden" id="join">
-<h2>Join a Game</h2>
-<label>Game PIN</label><input id="joinPin" maxlength="6" placeholder="">
-<label>Nickname</label><input id="nickname" maxlength="24" placeholder="Full name please">
-<button onclick="joinGame()">JOIN GAME</button>
-<button class="secondary" onclick="show('home')">Back</button>
-<div id="joinMsg"></div>
-</div>
-
-<div class="card hidden" id="playerLobby">
-<div class="center"><h2>You're in! 🎉</h2><div class="pin" id="playerPin"></div><p class="small">Waiting for the host to start the game...</p></div>
-</div>
-
-<div class="card hidden" id="playerQuestion">
-<div class="top"><h2 id="playerQNumber"></h2><span class="small">Score: <b id="playerScore">0</b></span></div>
-<h2 id="playerQuestionText"></h2>
-<div id="playerOptions"></div>
-<div id="playerMsg"></div>
-</div>
-
-<div class="card hidden" id="finished">
-<div class="center"><h1>GAME COMPLETE</h1><div class="score" id="finalScore"></div><p id="finalText"></p><button onclick="location.reload()">Back to Home</button></div>
-</div>
-
-</div>
 
 <script>
-const SUPABASE_URL="https://ozcjuthexxpctkbknfcs.supabase.co";
-const SUPABASE_KEY="sb_publishable_BxgDOAcICXk48EmmyvBjiQ_oTsvQ_Ax";
 
-let sb,game=null,player=null,questions=[],currentIndex=0,currentQuestion=null,answerLocked=false;
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-const $=id=>document.getElementById(id);
-function show(id){document.querySelectorAll(".card").forEach(x=>x.classList.add("hidden"));$(id).classList.remove("hidden")}
-function msg(id,text){$(id).innerHTML='<div class="msg">'+text+'</div>'}
-function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+const SUPABASE_URL =
+  "https://ozcjuthexxpctkbknfcs.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_BxgDOAcICXk48EmmyvBjiQ_oTsvQ_Ax";
+
+
+let sb = null;
+
+let game = null;
+let player = null;
+
+let questions = [];
+let currentIndex = 0;
+let currentQuestion = null;
+
+let answerLocked = false;
+
+let gameChannel = null;
+let playerChannel = null;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+
+function show(id){
+
+  document
+    .querySelectorAll(".card")
+    .forEach(card =>
+      card.classList.add("hidden")
+    );
+
+  const element = $(id);
+
+  if(element){
+    element.classList.remove("hidden");
+  }
+}
+
+
+function msg(id,text){
+
+  const element = $(id);
+
+  if(!element) return;
+
+  element.innerHTML =
+    '<div class="msg">' +
+    text +
+    '</div>';
+}
+
+
+function esc(value){
+
+  return String(value ?? "")
+    .replace(
+      /[&<>"']/g,
+      char => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[char])
+    );
+}
+
+
+function randomPin(){
+
+  return String(
+    Math.floor(
+      100000 +
+      Math.random() * 900000
+    )
+  );
+}
+
+
+/* =========================================================
+   LOAD SUPABASE
+========================================================= */
 
 async function init(){
- const s=document.createElement("script");
- s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
- document.head.appendChild(s);
- await new Promise((resolve,reject)=>{s.onload=resolve;s.onerror=reject});
- sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-}
-init().catch(()=>alert("Could not load Supabase. Check your internet connection."));
 
-function randomPin(){return String(Math.floor(100000+Math.random()*900000))}
+  const script =
+    document.createElement("script");
+
+  script.src =
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+
+  document.head.appendChild(script);
+
+  await new Promise(
+    (resolve,reject) => {
+
+      script.onload = resolve;
+      script.onerror = reject;
+
+    }
+  );
+
+  sb =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+}
+
+
+init().catch(error => {
+
+  console.error(error);
+
+  alert(
+    "Could not load Supabase. Check your internet connection."
+  );
+
+});
+
+
+/* =========================================================
+   HOST — CREATE GAME
+========================================================= */
 
 async function createGame(){
- const quiz_id=Number($("quizId").value||1),game_pin=randomPin();
- const {data,error}=await sb.from("games").insert({quiz_id,game_pin,status:"Waiting"}).select().single();
- if(error){msg("hostSetupMsg","Could not create game: "+esc(error.message));return}
- game=data;
- $("hostPin").textContent=game_pin;
- $("hostQuizId").textContent=quiz_id;
- show("hostLobby");
- subscribeToGame();
- loadPlayers();
-}
 
-async function loadPlayers(){
- const {data,error}=await sb.from("players").select("*").eq("game_id",game.id).order("created_at");
- if(error){$("hostPlayers").innerHTML='<div class="msg">'+esc(error.message)+"</div>";return}
- $("hostPlayers").innerHTML=data?.length
- ?data.map(p=>'<div class="player"><span>👤 '+esc(p.nickname)+'</span><b>'+(p.score??0)+"</b></div>").join("")
- :'<div class="msg">Waiting for players...</div>';
-}
+  if(!sb){
+    msg(
+      "hostSetupMsg",
+      "Supabase is still loading. Please try again."
+    );
+    return;
+  }
 
-function subscribeToGame(){
- sb.channel("game-"+game.id)
- .on("postgres_changes",{event:"*",schema:"public",table:"players",filter:"game_id=eq."+game.id},()=>loadPlayers())
- .on("postgres_changes",{event:"UPDATE",schema:"public",table:"games",filter:"id=eq."+game.id},payload=>{
-   game=payload.new;
- })
- .subscribe();
-}
+  const quiz_id =
+    Number($("quizId").value || 1);
 
-async function startGame(){
-  const {data,error}=await sb
-    .from("questions")
-    .select("*")
-    .eq("quiz_id",game.quiz_id)
-    .order("id");
+  const game_pin =
+    randomPin();
+
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from("games")
+      .insert({
+        quiz_id,
+        game_pin,
+        status:"Waiting",
+        current_question:0
+      })
+      .select()
+      .single();
+
 
   if(error){
-    msg("hostMsg","Could not load questions: "+esc(error.message));
+
+    console.error(error);
+
+    msg(
+      "hostSetupMsg",
+      "Could not create game: " +
+      esc(error.message)
+    );
+
     return;
   }
 
-  questions=data||[];
 
-  if(!questions.length){
-    msg("hostMsg","No questions found for Quiz ID "+game.quiz_id+". Add questions first.");
-    return;
-  }
+  game = data;
 
-  const {error:updateError}=await sb
-    .from("games")
-    .update({status:"Playing"})
-    .eq("id",game.id);
 
-  if(updateError){
-    msg("hostMsg","Could not start game: "+esc(updateError.message));
-    return;
-  }
+  $("hostPin").textContent =
+    game_pin;
 
-  currentIndex=0;
-  hostShowQuestion();
+  $("hostQuizId").textContent =
+    quiz_id;
+
+
+  show("hostLobby");
+
+
+  subscribeToGame();
+
+  await loadPlayers();
+
 }
 
-function getText(q){return q.question_text??q.question??q.text??q.prompt??"Question"}
+
+/* =========================================================
+   HOST — LOAD PLAYERS
+========================================================= */
+
+async function loadPlayers(){
+
+  if(!game) return;
+
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from("players")
+      .select("*")
+      .eq("game_id",game.id)
+      .order("created_at");
+
+
+  if(error){
+
+    console.error(error);
+
+    $("hostPlayers").innerHTML =
+      '<div class="msg">' +
+      esc(error.message) +
+      '</div>';
+
+    return;
+  }
+
+
+  if(data && data.length){
+
+    $("hostPlayers").innerHTML =
+      data.map(
+        p => `
+          <div class="player">
+            <span>
+              👤 ${esc(p.nickname)}
+            </span>
+
+            <b>
+              ${p.score ?? 0}
+            </b>
+          </div>
+        `
+      ).join("");
+
+  }else{
+
+    $("hostPlayers").innerHTML =
+      '<div class="loading">' +
+      'Waiting for players...' +
+      '</div>';
+
+  }
+
+}
+
+
+/* =========================================================
+   HOST — REALTIME
+========================================================= */
+
+function subscribeToGame(){
+
+  if(!game) return;
+
+
+  gameChannel =
+    sb
+      .channel("host-game-" + game.id)
+
+      /* Player joins / score changes */
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"players",
+          filter:"game_id=eq." + game.id
+        },
+        () => {
+
+          loadPlayers();
+
+          if(
+            currentQuestion &&
+            !$("hostQuestion").classList.contains("hidden")
+          ){
+
+            loadAnswerCount();
+
+          }
+
+        }
+      )
+
+      /* Game state changes */
+      .on(
+        "postgres_changes",
+        {
+          event:"UPDATE",
+          schema:"public",
+          table:"games",
+          filter:"id=eq." + game.id
+        },
+        payload => {
+
+          game = payload.new;
+
+        }
+      )
+
+      .subscribe();
+
+}
+
+
+/* =========================================================
+   HOST — START GAME
+========================================================= */
+
+async function startGame(){
+
+  const startButton =
+    $("startButton");
+
+  startButton.disabled = true;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await sb
+        .from("questions")
+        .select("*")
+        .eq("quiz_id",game.quiz_id)
+        .order("id");
+
+
+    if(error){
+
+      console.error(error);
+
+      msg(
+        "hostMsg",
+        "Could not load questions: " +
+        esc(error.message)
+      );
+
+      startButton.disabled = false;
+
+      return;
+    }
+
+
+    questions =
+      data || [];
+
+
+    if(!questions.length){
+
+      msg(
+        "hostMsg",
+        "No questions found for Quiz ID " +
+        game.quiz_id +
+        ". Add questions first."
+      );
+
+      startButton.disabled = false;
+
+      return;
+    }
+
+
+    /*
+      IMPORTANT:
+      Supabase is now the source of truth.
+      Question 0 = first question.
+    */
+
+    const {
+      data:updatedGame,
+      error:updateError
+    } =
+      await sb
+        .from("games")
+        .update({
+          status:"Playing",
+          current_question:0
+        })
+        .eq("id",game.id)
+        .select()
+        .single();
+
+
+    if(updateError){
+
+      console.error(updateError);
+
+      msg(
+        "hostMsg",
+        "Could not start game: " +
+        esc(updateError.message)
+      );
+
+      startButton.disabled = false;
+
+      return;
+    }
+
+
+    game =
+      updatedGame;
+
+    currentIndex = 0;
+
+    hostShowQuestion();
+
+    show("hostQuestion");
+
+  }catch(error){
+
+    console.error(error);
+
+    msg(
+      "hostMsg",
+      "Unexpected error: " +
+      esc(error.message)
+    );
+
+    startButton.disabled = false;
+
+  }
+
+}
+
+
+/* =========================================================
+   QUESTION HELPERS
+========================================================= */
+
+function getText(q){
+
+  return (
+    q.question_text ??
+    q.question ??
+    q.text ??
+    q.prompt ??
+    "Question"
+  );
+
+}
+
+
 function getOptions(q){
- if(Array.isArray(q.options))return q.options;
- if(typeof q.options==="string"){try{const x=JSON.parse(q.options);if(Array.isArray(x))return x}catch(e){}}
- return [q.option_a,q.option_b,q.option_c,q.option_d].filter(x=>x!==undefined&&x!==null);
+
+  if(Array.isArray(q.options)){
+
+    return q.options;
+
+  }
+
+
+  if(typeof q.options === "string"){
+
+    try{
+
+      const parsed =
+        JSON.parse(q.options);
+
+      if(Array.isArray(parsed)){
+
+        return parsed;
+
+      }
+
+    }catch(error){
+
+      console.warn(
+        "Could not parse options",
+        error
+      );
+
+    }
+
+  }
+
+
+  return [
+    q.option_a,
+    q.option_b,
+    q.option_c,
+    q.option_d
+  ].filter(
+    value =>
+      value !== undefined &&
+      value !== null
+  );
+
 }
-function getCorrect(q){return String(q.correct_answer??q.correct_option??q.answer??q.correct??"").trim()}
+
+
+function getCorrect(q){
+
+  return String(
+    q.correct_answer ??
+    q.correct_option ??
+    q.answer ??
+    q.correct ??
+    ""
+  ).trim();
+
+}
+
+
+/* =========================================================
+   HOST — SHOW QUESTION
+========================================================= */
 
 function hostShowQuestion(){
-  if(currentIndex>=questions.length){
+
+  if(
+    currentIndex >= questions.length
+  ){
+
     finishGame();
+
     return;
   }
 
-  show("hostQuestion");
 
-  currentQuestion=questions[currentIndex];
-  $("hostQCount").textContent="Question "+(currentIndex+1)+" of "+questions.length;
-  $("hostQuestionText").textContent=getText(currentQuestion);
-  $("hostOptions").innerHTML=getOptions(currentQuestion)
-    .map(o=>'<button class="option" disabled>'+esc(o)+"</button>")
-    .join("");
+  currentQuestion =
+    questions[currentIndex];
+
+
+  $("hostQCount").textContent =
+    "Question " +
+    (currentIndex + 1) +
+    " of " +
+    questions.length;
+
+
+  $("hostQuestionText").textContent =
+    getText(currentQuestion);
+
+
+  const colors = [
+    "red",
+    "blue",
+    "yellow",
+    "green"
+  ];
+
+
+  $("hostOptions").innerHTML =
+    getOptions(currentQuestion)
+      .map(
+        (option,index) => `
+          <button
+            class="option ${colors[index] || ""}"
+            disabled
+          >
+            ${esc(option)}
+          </button>
+        `
+      )
+      .join("");
+
+
+  $("nextQuestionButton").disabled =
+    false;
+
 
   loadAnswerCount();
+
 }
+
+
+/* =========================================================
+   HOST — ANSWER COUNT
+========================================================= */
 
 async function loadAnswerCount(){
- const {data}=await sb.from("answers").select("id,player_id,is_correct").eq("game_id",game.id).eq("question_id",currentQuestion.id);
- const {count}=await sb.from("players").select("id",{count:"exact",head:true}).eq("game_id",game.id);
- $("hostAnswers").textContent="Answers: "+(data?.length||0)+" / "+(count||0);
+
+  if(
+    !game ||
+    !currentQuestion
+  ) return;
+
+
+  const {
+    data
+  } =
+    await sb
+      .from("answers")
+      .select(
+        "id,player_id,is_correct"
+      )
+      .eq("game_id",game.id)
+      .eq(
+        "question_id",
+        currentQuestion.id
+      );
+
+
+  const {
+    count
+  } =
+    await sb
+      .from("players")
+      .select(
+        "id",
+        {
+          count:"exact",
+          head:true
+        }
+      )
+      .eq(
+        "game_id",
+        game.id
+      );
+
+
+  $("hostAnswers").textContent =
+    "Answers: " +
+    (data?.length || 0) +
+    " / " +
+    (count || 0);
+
 }
 
-function nextHostQuestion(){
- currentIndex++;
- hostShowQuestion();
+
+/* =========================================================
+   HOST — NEXT QUESTION
+========================================================= */
+
+async function nextHostQuestion(){
+
+  const button =
+    $("nextQuestionButton");
+
+
+  button.disabled = true;
+
+
+  const nextIndex =
+    currentIndex + 1;
+
+
+  /*
+    If there are no more questions,
+    finish the game.
+  */
+
+  if(
+    nextIndex >= questions.length
+  ){
+
+    await finishGame();
+
+    return;
+
+  }
+
+
+  /*
+    THIS IS THE IMPORTANT FIX.
+
+    We save the question number to Supabase.
+    Every player receives this Realtime update.
+  */
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from("games")
+      .update({
+        current_question:nextIndex
+      })
+      .eq("id",game.id)
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(error);
+
+    msg(
+      "hostAnswers",
+      "Could not move to the next question: " +
+      esc(error.message)
+    );
+
+    button.disabled = false;
+
+    return;
+
+  }
+
+
+  game =
+    data;
+
+  currentIndex =
+    nextIndex;
+
+
+  hostShowQuestion();
+
 }
+
+
+/* =========================================================
+   HOST — FINISH GAME
+========================================================= */
 
 async function finishGame(){
- await sb.from("games").update({status:"Finished"}).eq("id",game.id);
- show("finished");
- $("finalScore").textContent="Game complete!";
- $("finalText").textContent="Final scores are saved in the players table.";
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from("games")
+      .update({
+        status:"Finished"
+      })
+      .eq("id",game.id)
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+
+  }
+
+
+  game =
+    data;
+
+
+  show("finished");
+
+
+  $("finalScore").textContent =
+    "Game complete!";
+
+
+  $("finalText").textContent =
+    "Final scores are saved in the players table.";
+
 }
+
+
+/* =========================================================
+   HOST — END GAME
+========================================================= */
+
+async function endGame(){
+
+  if(!game){
+
+    location.reload();
+
+    return;
+
+  }
+
+
+  await sb
+    .from("games")
+    .update({
+      status:"Finished"
+    })
+    .eq("id",game.id);
+
+
+  location.reload();
+
+}
+
+
+/* =========================================================
+   PLAYER — JOIN
+========================================================= */
 
 async function joinGame(){
- const pin=$("joinPin").value.trim(),nickname=$("nickname").value.trim();
- if(!pin||!nickname){msg("joinMsg","Enter both the game PIN and a nickname.");return}
- const {data:g,error}=await sb.from("games").select("*").eq("game_pin",pin).maybeSingle();
- if(error||!g){msg("joinMsg","Game not found. Check the PIN.");return}
- if(g.status!=="Waiting"){msg("joinMsg","That game has already started or ended.");return}
- const {data:p,error:e}=await sb.from("players").insert({game_id:g.id,nickname,score:0,streak:0}).select().single();
- if(e){msg("joinMsg","Could not join: "+esc(e.message));return}
- game=g;player=p;
- $("playerPin").textContent=pin;
- show("playerLobby");
 
- sb.channel("player-game-"+g.id)
- .on("postgres_changes",{event:"UPDATE",schema:"public",table:"games",filter:"id=eq."+g.id},payload=>{
-   game=payload.new;
-   if(game.status==="Playing")loadPlayerQuestions();
-   if(game.status==="Finished")show("finished");
- })
- .subscribe();
+  const pin =
+    $("joinPin").value.trim();
+
+  const nickname =
+    $("nickname").value.trim();
+
+
+  if(!pin || !nickname){
+
+    msg(
+      "joinMsg",
+      "Enter both the game PIN and a nickname."
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data:g,
+    error
+  } =
+    await sb
+      .from("games")
+      .select("*")
+      .eq("game_pin",pin)
+      .maybeSingle();
+
+
+  if(error || !g){
+
+    msg(
+      "joinMsg",
+      "Game not found. Check the PIN."
+    );
+
+    return;
+
+  }
+
+
+  if(g.status !== "Waiting"){
+
+    msg(
+      "joinMsg",
+      "That game has already started or ended."
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data:p,
+    error:e
+  } =
+    await sb
+      .from("players")
+      .insert({
+        game_id:g.id,
+        nickname,
+        score:0,
+        streak:0
+      })
+      .select()
+      .single();
+
+
+  if(e){
+
+    console.error(e);
+
+    msg(
+      "joinMsg",
+      "Could not join: " +
+      esc(e.message)
+    );
+
+    return;
+
+  }
+
+
+  game = g;
+  player = p;
+
+
+  $("playerPin").textContent =
+    pin;
+
+
+  show("playerLobby");
+
+
+  /*
+    Listen for changes to this game.
+
+    This is what allows the player to receive:
+    - game started
+    - question changed
+    - game finished
+  */
+
+  playerChannel =
+    sb
+      .channel("player-game-" + g.id)
+
+      .on(
+        "postgres_changes",
+        {
+          event:"UPDATE",
+          schema:"public",
+          table:"games",
+          filter:"id=eq." + g.id
+        },
+        async payload => {
+
+          const oldGame =
+            game;
+
+          game =
+            payload.new;
+
+
+          /*
+            GAME STARTED
+          */
+
+          if(
+            game.status === "Playing" &&
+            oldGame.status !== "Playing"
+          ){
+
+            await loadPlayerQuestions();
+
+            return;
+
+          }
+
+
+          /*
+            HOST MOVED TO ANOTHER QUESTION
+          */
+
+          if(
+            game.status === "Playing" &&
+            oldGame.status === "Playing" &&
+            game.current_question !==
+              oldGame.current_question
+          ){
+
+            currentIndex =
+              Number(
+                game.current_question ?? 0
+              );
+
+
+            showPlayerQuestion();
+
+            return;
+
+          }
+
+
+          /*
+            GAME FINISHED
+          */
+
+          if(
+            game.status === "Finished"
+          ){
+
+            show("finished");
+
+            $("finalScore").textContent =
+              player.score ?? 0;
+
+            $("finalText").textContent =
+              "Thanks for playing!";
+
+          }
+
+        }
+      )
+
+      .subscribe();
+
 }
+
+
+/* =========================================================
+   PLAYER — LOAD QUESTIONS
+========================================================= */
 
 async function loadPlayerQuestions(){
- const {data,error}=await sb.from("questions").select("*").eq("quiz_id",game.quiz_id).order("id");
- if(error||!data?.length){msg("playerLobby","No questions are available for this quiz.");return}
- questions=data;currentIndex=0;showPlayerQuestion();
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from("questions")
+      .select("*")
+      .eq("quiz_id",game.quiz_id)
+      .order("id");
+
+
+  if(
+    error ||
+    !data?.length
+  ){
+
+    console.error(error);
+
+    show("playerLobby");
+
+    msg(
+      "playerLobby",
+      "No questions are available for this quiz."
+    );
+
+    return;
+
+  }
+
+
+  questions =
+    data;
+
+
+  /*
+    Use the question number saved in Supabase.
+    DO NOT reset this to zero blindly.
+  */
+
+  currentIndex =
+    Number(
+      game.current_question ?? 0
+    );
+
+
+  showPlayerQuestion();
+
 }
+
+
+/* =========================================================
+   PLAYER — SHOW QUESTION
+========================================================= */
 
 function showPlayerQuestion(){
- if(currentIndex>=questions.length){
-   show("finished");
-   $("finalScore").textContent="Thanks for playing!";
-   return;
- }
- currentQuestion=questions[currentIndex];
- answerLocked=false;
- const opts=getOptions(currentQuestion);
- $("playerQNumber").textContent="Question "+(currentIndex+1)+" of "+questions.length;
- $("playerQuestionText").textContent=getText(currentQuestion);
- $("playerScore").textContent=player.score??0;
- $("playerOptions").innerHTML=opts.map((o,i)=>'<button class="option" onclick="submitAnswer('+i+')">'+esc(o)+"</button>").join("");
- $("playerMsg").innerHTML="";
+
+  if(
+    currentIndex >= questions.length
+  ){
+
+    show("finished");
+
+    $("finalScore").textContent =
+      player.score ?? 0;
+
+    $("finalText").textContent =
+      "Thanks for playing!";
+
+    return;
+
+  }
+
+
+  currentQuestion =
+    questions[currentIndex];
+
+
+  answerLocked =
+    false;
+
+
+  const options =
+    getOptions(currentQuestion);
+
+
+  $("playerQNumber").textContent =
+    "Question " +
+    (currentIndex + 1) +
+    " of " +
+    questions.length;
+
+
+  $("playerQuestionText").textContent =
+    getText(currentQuestion);
+
+
+  $("playerScore").textContent =
+    player.score ?? 0;
+
+
+  const colors = [
+    "red",
+    "blue",
+    "yellow",
+    "green"
+  ];
+
+
+  $("playerOptions").innerHTML =
+    options
+      .map(
+        (option,index) => `
+          <button
+            class="answer ${colors[index] || ""}"
+            onclick="submitAnswer(${index})"
+          >
+            ${esc(option)}
+          </button>
+        `
+      )
+      .join("");
+
+
+  $("playerMsg").innerHTML =
+    "";
+
 }
 
-async function submitAnswer(i){
- if(answerLocked)return;
- answerLocked=true;
 
- const opts=getOptions(currentQuestion),selected=String(opts[i]),correct=getCorrect(currentQuestion);
- const isCorrect=selected===correct||String(i)===correct;
- const points=isCorrect?10:0;
+/* =========================================================
+   PLAYER — ANSWER
+========================================================= */
 
- const {error}=await sb.from("answers").insert({
-   question_id:currentQuestion.id,
-   selected_answer:selected,
-   is_correct:isCorrect,
-   game_id:game.id,
-   player_id:player.id,
-   response_time:0,
-   points
- });
+async function submitAnswer(index){
 
- if(error){
-   $("playerMsg").innerHTML='<div class="msg">Could not save answer: '+esc(error.message)+"</div>";
-   answerLocked=false;
-   return;
- }
+  if(answerLocked){
 
- const newScore=(player.score||0)+points;
- player.score=newScore;
- await sb.from("players").update({score:newScore,streak:isCorrect?(player.streak||0)+1:0}).eq("id",player.id);
+    return;
 
- document.querySelectorAll("#playerOptions button").forEach((b,j)=>{
-   b.disabled=true;
-   if(j===i)b.classList.add(isCorrect?"correct":"wrong");
- });
- $("playerMsg").innerHTML='<div class="msg">'+(isCorrect?"✅ Correct! +10 points":"❌ Not quite. +0 points")+"</div>";
+  }
 
- setTimeout(()=>{currentIndex++;showPlayerQuestion()},900);
+
+  answerLocked =
+    true;
+
+
+  const options =
+    getOptions(currentQuestion);
+
+
+  const selected =
+    String(options[index]);
+
+
+  const correct =
+    getCorrect(currentQuestion);
+
+
+  const isCorrect =
+    selected === correct ||
+    String(index) === correct;
+
+
+  const points =
+    isCorrect ? 10 : 0;
+
+
+  /*
+    Save answer
+  */
+
+  const {
+    error
+  } =
+    await sb
+      .from("answers")
+      .insert({
+
+        question_id:
+          currentQuestion.id,
+
+        selected_answer:
+          selected,
+
+        is_correct:
+          isCorrect,
+
+        game_id:
+          game.id,
+
+        player_id:
+          player.id,
+
+        response_time:
+          0,
+
+        points:
+          points
+
+      });
+
+
+  if(error){
+
+    console.error(error);
+
+    $("playerMsg").innerHTML =
+      '<div class="msg">' +
+      'Could not save answer: ' +
+      esc(error.message) +
+      '</div>';
+
+    answerLocked =
+      false;
+
+    return;
+
+  }
+
+
+  /*
+    Update score
+  */
+
+  const newScore =
+    (player.score || 0) +
+    points;
+
+
+  const newStreak =
+    isCorrect
+      ? (player.streak || 0) + 1
+      : 0;
+
+
+  player.score =
+    newScore;
+
+  player.streak =
+    newStreak;
+
+
+  const {
+    error:scoreError
+  } =
+    await sb
+      .from("players")
+      .update({
+        score:newScore,
+        streak:newStreak
+      })
+      .eq(
+        "id",
+        player.id
+      );
+
+
+  if(scoreError){
+
+    console.error(scoreError);
+
+  }
+
+
+  /*
+    Lock all answers
+    and visually show result.
+  */
+
+  document
+    .querySelectorAll(
+      "#playerOptions button"
+    )
+    .forEach(
+      (button,index) => {
+
+        button.disabled =
+          true;
+
+        if(index === index){
+
+          if(
+            index ===
+            Number(correct)
+          ){
+
+            button.classList.add(
+              "correct"
+            );
+
+          }
+
+        }
+
+      }
+    );
+
+
+  /*
+    Make sure the selected answer
+    is visually marked correctly.
+  */
+
+  const buttons =
+    document.querySelectorAll(
+      "#playerOptions button"
+    );
+
+
+  buttons.forEach(
+    (button,buttonIndex) => {
+
+      if(buttonIndex === index){
+
+        button.classList.add(
+          isCorrect
+            ? "correct"
+            : "wrong"
+        );
+
+      }
+
+    }
+  );
+
+
+  $("playerScore").textContent =
+    newScore;
+
+
+  $("playerMsg").innerHTML =
+    `
+      <div class="msg">
+        ${
+          isCorrect
+            ? "✅ Correct! +10 points"
+            : "❌ Not quite. +0 points"
+        }
+
+        <br>
+
+        <span class="small">
+          Waiting for the host to continue...
+        </span>
+      </div>
+    `;
+
+
+  /*
+    IMPORTANT:
+
+    We DO NOT move to the next question here.
+
+    The HOST controls the question.
+  */
+
 }
+
+
+/* =========================================================
+   PREVENT ACCIDENTAL FORM SUBMISSION
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key === "Enter" &&
+      document.activeElement.tagName === "INPUT"
+    ){
+
+      event.preventDefault();
+
+    }
+
+  }
+);
+
 </script>
+
 </body>
 </html>
