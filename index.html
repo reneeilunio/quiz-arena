@@ -1325,9 +1325,10 @@ function renderRanking(containerId, players, currentPlayerId=null, showAll=false
 
 async function showHostLeaderboardThenNext(){
 
-  // Prevent duplicate leaderboard/advance cycles.
-  if(isAdvancingQuestion) return;
-  isAdvancingQuestion = true;
+  // The leaderboard has its own transition lock. Do NOT use
+  // isAdvancingQuestion here because nextHostQuestion() needs
+  // to acquire that lock when it actually advances the game.
+  if(leaderboardInterval) return;
 
   clearHostTimer();
   clearLeaderboardTimers();
@@ -1356,7 +1357,6 @@ async function showHostLeaderboardThenNext(){
 
   // For the final question, there is nothing else to advance to.
   if(!hasNext){
-    isAdvancingQuestion = false;
     return;
   }
 
