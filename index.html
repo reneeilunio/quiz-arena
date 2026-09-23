@@ -3,65 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Quiz Arena</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
 
-:root{
-  --bg:#070a18;
-  --card:#11162d;
-  --card2:#191f3c;
-  --border:#30385f;
-  --text:#fff;
-  --muted:#aeb7d8;
-  --purple:#7657ff;
-
-  --red:#e21b3c;
-  --blue:#1368ce;
-  --yellow:#d89b00;
-  --green:#26890c;
-}
-
 body{
   margin:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#070a18;
+  color:#fff;
   min-height:100vh;
-  background:
-    radial-gradient(circle at top,#25295b 0,#101226 45%,#070a18 100%);
-  color:var(--text);
-  font-family:Inter,Arial,Helvetica,sans-serif;
 }
 
 .wrap{
-  width:min(1000px,94vw);
+  max-width:1000px;
   margin:auto;
-  padding:30px 0;
+  padding:30px 18px;
 }
 
 .card{
-  background:rgba(17,22,45,.97);
-  border:1px solid var(--border);
-  border-radius:22px;
+  background:#11162d;
+  border:1px solid #293154;
+  border-radius:18px;
   padding:30px;
-  box-shadow:0 20px 60px rgba(0,0,0,.4);
+  box-shadow:0 20px 60px #0005;
 }
 
 .hidden{
   display:none!important;
 }
 
-.center{
-  text-align:center;
-}
-
 h1{
-  font-size:52px;
-  font-weight:900;
-  letter-spacing:-2px;
+  font-size:46px;
+  letter-spacing:2px;
   text-align:center;
-  margin:10px 0 6px;
+  margin:10px 0 4px;
 }
 
 h2{
@@ -70,255 +51,206 @@ h2{
 
 .sub{
   text-align:center;
-  color:var(--muted);
-  margin-bottom:30px;
-  font-size:17px;
-}
-
-label{
-  display:block;
-  color:var(--muted);
-  font-size:13px;
-  margin-top:12px;
-}
-
-input{
-  width:100%;
-  padding:15px;
-  border-radius:12px;
-  border:1px solid #394264;
-  background:#090d20;
-  color:#fff;
-  font-size:17px;
-  margin:6px 0 10px;
-  outline:none;
-}
-
-input:focus{
-  border-color:var(--purple);
+  color:#9da7ca;
+  margin-bottom:28px;
 }
 
 button{
-  width:100%;
   border:0;
-  border-radius:12px;
-  padding:15px 20px;
-  margin-top:10px;
-  background:var(--purple);
-  color:#fff;
-  font-size:16px;
-  font-weight:800;
+  border-radius:10px;
+  padding:14px 18px;
+  font-weight:700;
   cursor:pointer;
-  transition:.15s;
+  background:#7657ff;
+  color:#fff;
+  width:100%;
+  margin-top:10px;
+  font-size:15px;
 }
 
 button:hover{
   filter:brightness(1.08);
-  transform:translateY(-1px);
-}
-
-button:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-  transform:none;
 }
 
 button.secondary{
   background:#252c52;
 }
 
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
 }
 
-.small{
-  color:var(--muted);
-  font-size:14px;
+input{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #394264;
+  background:#090d20;
+  color:#fff;
+  font-size:16px;
+  margin:6px 0 10px;
+}
+
+label{
+  font-size:13px;
+  color:#aeb7d8;
+}
+
+.center{
+  text-align:center;
 }
 
 .pin{
+  font-size:58px;
+  letter-spacing:8px;
+  font-weight:800;
   text-align:center;
-  font-size:64px;
-  font-weight:900;
-  letter-spacing:10px;
-  margin:20px 0;
+  margin:18px 0;
 }
 
 .players{
   display:grid;
   gap:8px;
-  margin-top:12px;
+  margin-top:18px;
 }
 
 .player{
   background:#1a2040;
-  border-radius:11px;
-  padding:14px 16px;
+  padding:12px 15px;
+  border-radius:10px;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
 
 .msg{
+  padding:12px;
   background:#191f3c;
-  border-radius:11px;
-  padding:14px;
-  margin-top:14px;
-  color:#d4daf5;
+  border-radius:10px;
+  color:#cbd3f3;
+  margin:12px 0;
 }
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+}
+
+.small{
+  font-size:13px;
+  color:#aeb7d8;
+}
+
+.score{
+  font-size:34px;
+  font-weight:800;
+  text-align:center;
+}
+
+/* HOST OPTIONS */
 
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
+  gap:10px;
 }
 
 .option{
   text-align:left;
-  min-height:65px;
-  font-size:17px;
   background:#242c53;
-  border:2px solid transparent;
+  border:1px solid #394264;
 }
 
-.option.red{
-  background:var(--red);
-}
+/* PLAYER ANSWERS */
 
-.option.blue{
-  background:var(--blue);
-}
-
-.option.yellow{
-  background:var(--yellow);
-}
-
-.option.green{
-  background:var(--green);
-}
-
-.option.correct{
-  background:#17734d!important;
-  border-color:#fff;
-}
-
-.option.wrong{
-  background:#9b3048!important;
-  border-color:#fff;
-}
-
-.question{
-  font-size:clamp(28px,4vw,42px);
-  line-height:1.15;
-  font-weight:900;
-  text-align:center;
-  margin:30px 0;
-}
-
-.player-question{
-  font-size:clamp(26px,4vw,38px);
-  line-height:1.2;
-  font-weight:900;
-  text-align:center;
-  margin:28px 0;
-}
-
-.answers{
+.answer-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:14px;
+  margin-top:24px;
 }
 
 .answer{
-  min-height:100px;
-  border:0;
-  border-radius:16px;
-  color:white;
-  font-size:18px;
-  font-weight:900;
-  padding:20px;
-  cursor:pointer;
-  text-align:left;
+  min-height:90px;
   margin:0;
-}
-
-.answer.red{
-  background:var(--red);
-}
-
-.answer.blue{
-  background:var(--blue);
-}
-
-.answer.yellow{
-  background:var(--yellow);
-}
-
-.answer.green{
-  background:var(--green);
+  border-radius:14px;
+  font-size:20px;
+  font-weight:800;
+  text-align:left;
+  padding:20px;
+  transition:.15s;
 }
 
 .answer:hover{
-  transform:scale(1.01);
-  filter:brightness(1.08);
+  transform:translateY(-2px);
+  filter:brightness(1.1);
 }
 
-.answer:disabled{
-  cursor:default;
-  opacity:.7;
+.answer.red{
+  background:#e21b3c;
+}
+
+.answer.blue{
+  background:#1368ce;
+}
+
+.answer.yellow{
+  background:#d89e00;
+  color:#111;
+}
+
+.answer.green{
+  background:#26890c;
 }
 
 .answer.correct{
-  outline:4px solid white;
-  box-shadow:0 0 0 5px #3ddc84;
-  opacity:1;
+  background:#17734d!important;
 }
 
 .answer.wrong{
-  outline:4px solid white;
-  box-shadow:0 0 0 5px #ff526d;
+  background:#9b3048!important;
 }
 
-.score{
-  font-size:42px;
-  font-weight:900;
-  text-align:center;
+.question-text{
+  font-size:30px;
+  line-height:1.25;
+  margin:30px 0 0;
 }
 
-.status{
-  text-align:center;
-  color:var(--muted);
-  margin-top:15px;
+.question-number{
+  font-size:14px;
+  color:#aeb7d8;
 }
 
-.loading{
-  text-align:center;
-  color:var(--muted);
-  padding:20px;
-}
+@media(max-width:600px){
 
-@media(max-width:650px){
   .grid,
-  .answers{
+  .answer-grid{
     grid-template-columns:1fr;
   }
 
   h1{
-    font-size:40px;
+    font-size:36px;
   }
 
   .pin{
-    font-size:45px;
-    letter-spacing:6px;
+    font-size:44px;
   }
 
-  .card{
-    padding:20px;
+  .question-text{
+    font-size:23px;
   }
+
+  .answer{
+    min-height:70px;
+    font-size:17px;
+  }
+
 }
+
 </style>
 </head>
 
@@ -326,229 +258,265 @@ button.secondary{
 
 <div class="wrap">
 
-  <!-- HOME -->
-  <div class="card" id="home">
-    <h1>QUIZ ARENA</h1>
-    <div class="sub">
-      Account Recovery Training · Kahoot-style Quiz
-    </div>
+<!-- HOME -->
 
-    <button onclick="show('hostSetup')">
-      🎤 Host a Game
-    </button>
+<div class="card" id="home">
 
-    <button class="secondary" onclick="show('join')">
-      🎮 Join a Game
-    </button>
+  <h1>QUIZ ARENA</h1>
+
+  <div class="sub">
+    Account Recovery Training · 10 Questions
   </div>
 
+  <button onclick="show('hostSetup')">
+    Host a Game
+  </button>
 
-  <!-- HOST SETUP -->
-  <div class="card hidden" id="hostSetup">
+  <button class="secondary" onclick="show('join')">
+    Join a Game
+  </button>
 
-    <h2>Host a Game</h2>
-
-    <label>Quiz ID</label>
-    <input
-      id="quizId"
-      type="number"
-      value="1"
-      min="1"
-    >
-
-    <button onclick="createGame()">
-      CREATE GAME
-    </button>
-
-    <button class="secondary" onclick="show('home')">
-      BACK
-    </button>
-
-    <div id="hostSetupMsg"></div>
-
-  </div>
+</div>
 
 
-  <!-- HOST LOBBY -->
-  <div class="card hidden" id="hostLobby">
+<!-- HOST SETUP -->
 
-    <div class="top">
-      <h2>Waiting Room</h2>
+<div class="card hidden" id="hostSetup">
 
-      <span class="small">
-        Quiz ID:
-        <b id="hostQuizId"></b>
-      </span>
-    </div>
+  <h2>Host a Game</h2>
 
-    <div class="small">
-      GAME PIN
-    </div>
+  <label>Quiz ID</label>
 
-    <div class="pin" id="hostPin"></div>
+  <input
+    id="quizId"
+    type="number"
+    value="1"
+    min="1"
+  >
 
-    <div class="small">
-      Players
-    </div>
+  <button onclick="createGame()">
+    Create Game
+  </button>
 
-    <div class="players" id="hostPlayers">
-      <div class="loading">
-        Waiting for players...
-      </div>
-    </div>
+  <button
+    class="secondary"
+    onclick="show('home')"
+  >
+    Back
+  </button>
 
-    <button id="startButton" onclick="startGame()">
-      START GAME
-    </button>
+  <div id="hostSetupMsg"></div>
 
-    <button class="secondary" onclick="endGame()">
-      END GAME
-    </button>
+</div>
 
-    <div id="hostMsg"></div>
+
+<!-- HOST LOBBY -->
+
+<div class="card hidden" id="hostLobby">
+
+  <div class="top">
+
+    <h2>Waiting Room</h2>
+
+    <span class="small">
+      Quiz ID:
+      <b id="hostQuizId"></b>
+    </span>
 
   </div>
 
+  <div class="small">
+    GAME PIN
+  </div>
 
-  <!-- HOST QUESTION -->
-  <div class="card hidden" id="hostQuestion">
+  <div
+    class="pin"
+    id="hostPin"
+  ></div>
 
-    <div class="top">
-      <h2>Live Game</h2>
+  <div class="small">
+    Players
+  </div>
 
-      <span class="small" id="hostQCount">
-        Question 1
-      </span>
-    </div>
+  <div
+    class="players"
+    id="hostPlayers"
+  ></div>
 
-    <div class="question" id="hostQuestionText">
-      Loading...
-    </div>
+  <button onclick="startGame()">
+    START GAME
+  </button>
 
-    <div id="hostOptions" class="grid"></div>
+  <button
+    class="secondary"
+    onclick="endGame()"
+  >
+    End Game
+  </button>
 
-    <div class="msg" id="hostAnswers">
-      Waiting for answers...
-    </div>
+  <div id="hostMsg"></div>
 
-    <button
-      id="nextQuestionButton"
-      onclick="nextHostQuestion()"
-    >
-      NEXT QUESTION →
-    </button>
+</div>
+
+
+<!-- HOST QUESTION -->
+
+<div class="card hidden" id="hostQuestion">
+
+  <div class="top">
+
+    <h2>Live Game</h2>
+
+    <span
+      class="small"
+      id="hostQCount"
+    ></span>
 
   </div>
 
+  <h2
+    class="question-text"
+    id="hostQuestionText"
+  ></h2>
 
-  <!-- PLAYER JOIN -->
-  <div class="card hidden" id="join">
+  <div
+    id="hostOptions"
+    class="grid"
+  ></div>
 
-    <h2>Join a Game</h2>
-
-    <label>Game PIN</label>
-
-    <input
-      id="joinPin"
-      maxlength="6"
-      placeholder="482731"
-    >
-
-    <label>Nickname</label>
-
-    <input
-      id="nickname"
-      maxlength="24"
-      placeholder="Renee"
-    >
-
-    <button onclick="joinGame()">
-      JOIN GAME
-    </button>
-
-    <button class="secondary" onclick="show('home')">
-      BACK
-    </button>
-
-    <div id="joinMsg"></div>
-
+  <div
+    class="msg"
+    id="hostAnswers"
+  >
+    Waiting for players...
   </div>
 
+  <button onclick="nextHostQuestion()">
+    NEXT QUESTION
+  </button>
 
-  <!-- PLAYER LOBBY -->
-  <div class="card hidden" id="playerLobby">
-
-    <div class="center">
-
-      <h2>
-        You're in! 🎉
-      </h2>
-
-      <div class="pin" id="playerPin"></div>
-
-      <p class="small">
-        Waiting for the host to start the game...
-      </p>
-
-    </div>
-
-  </div>
+</div>
 
 
-  <!-- PLAYER QUESTION -->
-  <div class="card hidden" id="playerQuestion">
+<!-- JOIN -->
 
-    <div class="top">
+<div class="card hidden" id="join">
 
-      <span class="small" id="playerQNumber">
-        Question 1 of 10
-      </span>
+  <h2>Join a Game</h2>
 
-      <span class="small">
-        Score:
-        <b id="playerScore">0</b>
-      </span>
+  <label>Game PIN</label>
 
-    </div>
+  <input
+    id="joinPin"
+    maxlength="6"
+    placeholder="482731"
+  >
 
-    <div class="player-question" id="playerQuestionText">
-      Loading...
-    </div>
+  <label>Nickname</label>
+
+  <input
+    id="nickname"
+    maxlength="24"
+    placeholder="Renee"
+  >
+
+  <button onclick="joinGame()">
+    JOIN GAME
+  </button>
+
+  <button
+    class="secondary"
+    onclick="show('home')"
+  >
+    Back
+  </button>
+
+  <div id="joinMsg"></div>
+
+</div>
+
+
+<!-- PLAYER LOBBY -->
+
+<div class="card hidden" id="playerLobby">
+
+  <div class="center">
+
+    <h2>
+      You're in! 🎉
+    </h2>
 
     <div
-      id="playerOptions"
-      class="answers"
+      class="pin"
+      id="playerPin"
     ></div>
 
-    <div id="playerMsg"></div>
+    <p class="small">
+      Waiting for the host to start the game...
+    </p>
 
   </div>
 
+</div>
 
-  <!-- FINISHED -->
-  <div class="card hidden" id="finished">
 
-    <div class="center">
+<!-- PLAYER QUESTION -->
 
-      <h1>🏆 GAME COMPLETE</h1>
+<div class="card hidden" id="playerQuestion">
 
-      <div
-        class="score"
-        id="finalScore"
-      ></div>
+  <div class="top">
 
-      <p
-        id="finalText"
-        class="status"
-      ></p>
+    <div
+      class="question-number"
+      id="playerQNumber"
+    ></div>
 
-      <button onclick="location.reload()">
-        BACK TO HOME
-      </button>
-
+    <div class="small">
+      Score:
+      <b id="playerScore">0</b>
     </div>
 
   </div>
+
+  <h2
+    class="question-text"
+    id="playerQuestionText"
+  ></h2>
+
+  <div
+    id="playerOptions"
+    class="answer-grid"
+  ></div>
+
+  <div id="playerMsg"></div>
+
+</div>
+
+
+<!-- FINISHED -->
+
+<div class="card hidden" id="finished">
+
+  <div class="center">
+
+    <h1>
+      GAME COMPLETE
+    </h1>
+
+    <div
+      class="score"
+      id="finalScore"
+    ></div>
+
+    <p id="finalText"></p>
+
+    <button onclick="location.reload()">
+      Back to Home
+    </button>
+
+  </div>
+
+</div>
 
 </div>
 
@@ -566,103 +534,94 @@ const SUPABASE_KEY =
   "sb_publishable_BxgDOAcICXk48EmmyvBjiQ_oTsvQ_Ax";
 
 
-let sb = null;
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let sb;
 
 let game = null;
+
 let player = null;
 
 let questions = [];
+
 let currentIndex = 0;
+
 let currentQuestion = null;
 
 let answerLocked = false;
 
-let gameChannel = null;
-let playerChannel = null;
+let playerWatcher = null;
 
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
-const $ = id => document.getElementById(id);
+const $ = id =>
+  document.getElementById(id);
 
 
 function show(id){
 
   document
     .querySelectorAll(".card")
-    .forEach(card =>
-      card.classList.add("hidden")
+    .forEach(x =>
+      x.classList.add("hidden")
     );
 
-  const element = $(id);
-
-  if(element){
-    element.classList.remove("hidden");
-  }
+  $(id).classList.remove("hidden");
 }
 
 
 function msg(id,text){
 
-  const element = $(id);
-
-  if(!element) return;
-
-  element.innerHTML =
+  $(id).innerHTML =
     '<div class="msg">' +
     text +
     '</div>';
+
 }
 
 
-function esc(value){
+function esc(v){
 
-  return String(value ?? "")
+  return String(v ?? "")
     .replace(
       /[&<>"']/g,
-      char => ({
+      m => ({
         "&":"&amp;",
         "<":"&lt;",
         ">":"&gt;",
         '"':"&quot;",
         "'":"&#039;"
-      }[char])
+      }[m])
     );
-}
 
-
-function randomPin(){
-
-  return String(
-    Math.floor(
-      100000 +
-      Math.random() * 900000
-    )
-  );
 }
 
 
 /* =========================================================
-   LOAD SUPABASE
+   INIT SUPABASE
 ========================================================= */
 
 async function init(){
 
-  const script =
+  const s =
     document.createElement("script");
 
-  script.src =
+  s.src =
     "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 
-  document.head.appendChild(script);
+  document.head.appendChild(s);
 
   await new Promise(
     (resolve,reject) => {
 
-      script.onload = resolve;
-      script.onerror = reject;
+      s.onload = resolve;
+
+      s.onerror = reject;
 
     }
   );
@@ -672,12 +631,11 @@ async function init(){
       SUPABASE_URL,
       SUPABASE_KEY
     );
+
 }
 
 
-init().catch(error => {
-
-  console.error(error);
+init().catch(() => {
 
   alert(
     "Could not load Supabase. Check your internet connection."
@@ -687,21 +645,31 @@ init().catch(error => {
 
 
 /* =========================================================
-   HOST — CREATE GAME
+   GAME PIN
+========================================================= */
+
+function randomPin(){
+
+  return String(
+    Math.floor(
+      100000 +
+      Math.random() * 900000
+    )
+  );
+
+}
+
+
+/* =========================================================
+   CREATE GAME
 ========================================================= */
 
 async function createGame(){
 
-  if(!sb){
-    msg(
-      "hostSetupMsg",
-      "Supabase is still loading. Please try again."
-    );
-    return;
-  }
-
   const quiz_id =
-    Number($("quizId").value || 1);
+    Number(
+      $("quizId").value || 1
+    );
 
   const game_pin =
     randomPin();
@@ -725,8 +693,6 @@ async function createGame(){
 
   if(error){
 
-    console.error(error);
-
     msg(
       "hostSetupMsg",
       "Could not create game: " +
@@ -734,6 +700,7 @@ async function createGame(){
     );
 
     return;
+
   }
 
 
@@ -750,15 +717,15 @@ async function createGame(){
   show("hostLobby");
 
 
-  subscribeToGame();
+  subscribeToHostGame();
 
-  await loadPlayers();
+  loadPlayers();
 
 }
 
 
 /* =========================================================
-   HOST — LOAD PLAYERS
+   LOAD PLAYERS
 ========================================================= */
 
 async function loadPlayers(){
@@ -779,230 +746,201 @@ async function loadPlayers(){
 
   if(error){
 
-    console.error(error);
-
     $("hostPlayers").innerHTML =
       '<div class="msg">' +
       esc(error.message) +
-      '</div>';
+      "</div>";
 
     return;
-  }
-
-
-  if(data && data.length){
-
-    $("hostPlayers").innerHTML =
-      data.map(
-        p => `
-          <div class="player">
-            <span>
-              👤 ${esc(p.nickname)}
-            </span>
-
-            <b>
-              ${p.score ?? 0}
-            </b>
-          </div>
-        `
-      ).join("");
-
-  }else{
-
-    $("hostPlayers").innerHTML =
-      '<div class="loading">' +
-      'Waiting for players...' +
-      '</div>';
 
   }
+
+
+  $("hostPlayers").innerHTML =
+    data?.length
+
+      ?
+
+      data
+        .map(
+          p =>
+            '<div class="player">' +
+
+            '<span>👤 ' +
+            esc(p.nickname) +
+            '</span>' +
+
+            '<b>' +
+            (p.score ?? 0) +
+            "</b>" +
+
+            "</div>"
+        )
+        .join("")
+
+      :
+
+      '<div class="msg">' +
+      "Waiting for players..." +
+      "</div>";
 
 }
 
 
 /* =========================================================
-   HOST — REALTIME
+   HOST REALTIME
 ========================================================= */
 
-function subscribeToGame(){
+function subscribeToHostGame(){
 
-  if(!game) return;
+  sb
+    .channel(
+      "host-game-" + game.id
+    )
 
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"players",
+        filter:
+          "game_id=eq." + game.id
+      },
+      () => {
 
-  gameChannel =
-    sb
-      .channel("host-game-" + game.id)
+        loadPlayers();
 
-      /* Player joins / score changes */
-      .on(
-        "postgres_changes",
-        {
-          event:"*",
-          schema:"public",
-          table:"players",
-          filter:"game_id=eq." + game.id
-        },
-        () => {
+        if(currentQuestion){
 
-          loadPlayers();
-
-          if(
-            currentQuestion &&
-            !$("hostQuestion").classList.contains("hidden")
-          ){
-
-            loadAnswerCount();
-
-          }
+          loadAnswerCount();
 
         }
-      )
 
-      /* Game state changes */
-      .on(
-        "postgres_changes",
-        {
-          event:"UPDATE",
-          schema:"public",
-          table:"games",
-          filter:"id=eq." + game.id
-        },
-        payload => {
+      }
+    )
 
-          game = payload.new;
+    .on(
+      "postgres_changes",
+      {
+        event:"UPDATE",
+        schema:"public",
+        table:"games",
+        filter:
+          "id=eq." + game.id
+      },
+      payload => {
 
-        }
-      )
+        game =
+          payload.new;
 
-      .subscribe();
+      }
+    )
+
+    .subscribe();
 
 }
 
 
 /* =========================================================
-   HOST — START GAME
+   START GAME
 ========================================================= */
 
 async function startGame(){
 
-  const startButton =
-    $("startButton");
-
-  startButton.disabled = true;
-
-
-  try{
-
-    const {
-      data,
-      error
-    } =
-      await sb
-        .from("questions")
-        .select("*")
-        .eq("quiz_id",game.quiz_id)
-        .order("id");
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from("questions")
+      .select("*")
+      .eq("quiz_id",game.quiz_id)
+      .order("id");
 
 
-    if(error){
-
-      console.error(error);
-
-      msg(
-        "hostMsg",
-        "Could not load questions: " +
-        esc(error.message)
-      );
-
-      startButton.disabled = false;
-
-      return;
-    }
-
-
-    questions =
-      data || [];
-
-
-    if(!questions.length){
-
-      msg(
-        "hostMsg",
-        "No questions found for Quiz ID " +
-        game.quiz_id +
-        ". Add questions first."
-      );
-
-      startButton.disabled = false;
-
-      return;
-    }
-
-
-    /*
-      IMPORTANT:
-      Supabase is now the source of truth.
-      Question 0 = first question.
-    */
-
-    const {
-      data:updatedGame,
-      error:updateError
-    } =
-      await sb
-        .from("games")
-        .update({
-          status:"Playing",
-          current_question:0
-        })
-        .eq("id",game.id)
-        .select()
-        .single();
-
-
-    if(updateError){
-
-      console.error(updateError);
-
-      msg(
-        "hostMsg",
-        "Could not start game: " +
-        esc(updateError.message)
-      );
-
-      startButton.disabled = false;
-
-      return;
-    }
-
-
-    game =
-      updatedGame;
-
-    currentIndex = 0;
-
-    hostShowQuestion();
-
-    show("hostQuestion");
-
-  }catch(error){
-
-    console.error(error);
+  if(error){
 
     msg(
       "hostMsg",
-      "Unexpected error: " +
+      "Could not load questions: " +
       esc(error.message)
     );
 
-    startButton.disabled = false;
+    return;
 
   }
+
+
+  questions =
+    data || [];
+
+
+  if(!questions.length){
+
+    msg(
+      "hostMsg",
+      "No questions found for Quiz ID " +
+      game.quiz_id +
+      ". Add questions first."
+    );
+
+    return;
+
+  }
+
+
+  currentIndex = 0;
+
+
+  /*
+    IMPORTANT:
+    The host controls the active question.
+  */
+
+  const {
+    data:updatedGame,
+    error:updateError
+  } =
+    await sb
+      .from("games")
+      .update({
+        status:"Playing",
+        current_question:0
+      })
+      .eq("id",game.id)
+      .select()
+      .single();
+
+
+  if(updateError){
+
+    msg(
+      "hostMsg",
+      "Could not start game: " +
+      esc(updateError.message)
+    );
+
+    console.error(
+      updateError
+    );
+
+    return;
+
+  }
+
+
+  game =
+    updatedGame;
+
+
+  hostShowQuestion();
 
 }
 
 
 /* =========================================================
-   QUESTION HELPERS
+   QUESTION TEXT
 ========================================================= */
 
 function getText(q){
@@ -1018,53 +956,39 @@ function getText(q){
 }
 
 
+/* =========================================================
+   QUESTION OPTIONS
+   YOUR DATABASE USES answer_a / answer_b / etc.
+========================================================= */
+
 function getOptions(q){
 
-  if(Array.isArray(q.options)){
-
-    return q.options;
-
-  }
-
-
-  if(typeof q.options === "string"){
-
-    try{
-
-      const parsed =
-        JSON.parse(q.options);
-
-      if(Array.isArray(parsed)){
-
-        return parsed;
-
-      }
-
-    }catch(error){
-
-      console.warn(
-        "Could not parse options",
-        error
-      );
-
-    }
-
-  }
-
+  /*
+    This is intentionally using
+    answer_a, answer_b, answer_c, answer_d
+    because those are the columns
+    in your questions table.
+  */
 
   return [
-    q.option_a,
-    q.option_b,
-    q.option_c,
-    q.option_d
-  ].filter(
-    value =>
-      value !== undefined &&
-      value !== null
+    q.answer_a,
+    q.answer_b,
+    q.answer_c,
+    q.answer_d
+  ]
+  .filter(
+    x =>
+      x !== undefined &&
+      x !== null &&
+      String(x).trim() !== ""
   );
 
 }
 
+
+/* =========================================================
+   CORRECT ANSWER
+========================================================= */
 
 function getCorrect(q){
 
@@ -1080,18 +1004,20 @@ function getCorrect(q){
 
 
 /* =========================================================
-   HOST — SHOW QUESTION
+   HOST SHOW QUESTION
 ========================================================= */
 
 function hostShowQuestion(){
 
   if(
-    currentIndex >= questions.length
+    currentIndex >=
+    questions.length
   ){
 
     finishGame();
 
     return;
+
   }
 
 
@@ -1110,31 +1036,19 @@ function hostShowQuestion(){
     getText(currentQuestion);
 
 
-  const colors = [
-    "red",
-    "blue",
-    "yellow",
-    "green"
-  ];
+  const options =
+    getOptions(currentQuestion);
 
 
   $("hostOptions").innerHTML =
-    getOptions(currentQuestion)
+    options
       .map(
-        (option,index) => `
-          <button
-            class="option ${colors[index] || ""}"
-            disabled
-          >
-            ${esc(option)}
-          </button>
-        `
+        o =>
+          '<button class="option" disabled>' +
+          esc(o) +
+          "</button>"
       )
       .join("");
-
-
-  $("nextQuestionButton").disabled =
-    false;
 
 
   loadAnswerCount();
@@ -1143,15 +1057,13 @@ function hostShowQuestion(){
 
 
 /* =========================================================
-   HOST — ANSWER COUNT
+   HOST ANSWER COUNT
 ========================================================= */
 
 async function loadAnswerCount(){
 
-  if(
-    !game ||
-    !currentQuestion
-  ) return;
+  if(!game || !currentQuestion)
+    return;
 
 
   const {
@@ -1162,7 +1074,10 @@ async function loadAnswerCount(){
       .select(
         "id,player_id,is_correct"
       )
-      .eq("game_id",game.id)
+      .eq(
+        "game_id",
+        game.id
+      )
       .eq(
         "question_id",
         currentQuestion.id
@@ -1197,29 +1112,22 @@ async function loadAnswerCount(){
 
 
 /* =========================================================
-   HOST — NEXT QUESTION
+   NEXT QUESTION
 ========================================================= */
 
 async function nextHostQuestion(){
 
-  const button =
-    $("nextQuestionButton");
-
-
-  button.disabled = true;
-
-
-  const nextIndex =
-    currentIndex + 1;
+  currentIndex++;
 
 
   /*
-    If there are no more questions,
+    If we've gone past the final question,
     finish the game.
   */
 
   if(
-    nextIndex >= questions.length
+    currentIndex >=
+    questions.length
   ){
 
     await finishGame();
@@ -1230,10 +1138,9 @@ async function nextHostQuestion(){
 
 
   /*
-    THIS IS THE IMPORTANT FIX.
-
-    We save the question number to Supabase.
-    Every player receives this Realtime update.
+    Update Supabase FIRST.
+    This tells every player which
+    question should now be displayed.
   */
 
   const {
@@ -1243,35 +1150,42 @@ async function nextHostQuestion(){
     await sb
       .from("games")
       .update({
-        current_question:nextIndex
+        current_question:
+          currentIndex
       })
-      .eq("id",game.id)
+      .eq(
+        "id",
+        game.id
+      )
       .select()
       .single();
 
 
   if(error){
 
-    console.error(error);
+    console.error(
+      "NEXT QUESTION ERROR:",
+      error
+    );
 
     msg(
       "hostAnswers",
-      "Could not move to the next question: " +
+      "Could not move to next question: " +
       esc(error.message)
     );
 
-    button.disabled = false;
+    /*
+      Roll back local index
+    */
+
+    currentIndex--;
 
     return;
 
   }
 
 
-  game =
-    data;
-
-  currentIndex =
-    nextIndex;
+  game = data;
 
 
   hostShowQuestion();
@@ -1280,10 +1194,14 @@ async function nextHostQuestion(){
 
 
 /* =========================================================
-   HOST — FINISH GAME
+   FINISH GAME
 ========================================================= */
 
 async function finishGame(){
+
+  if(!game)
+    return;
+
 
   const {
     data,
@@ -1294,22 +1212,27 @@ async function finishGame(){
       .update({
         status:"Finished"
       })
-      .eq("id",game.id)
+      .eq(
+        "id",
+        game.id
+      )
       .select()
       .single();
 
 
   if(error){
 
-    console.error(error);
+    console.error(
+      "FINISH GAME ERROR:",
+      error
+    );
 
     return;
 
   }
 
 
-  game =
-    data;
+  game = data;
 
 
   show("finished");
@@ -1326,26 +1249,24 @@ async function finishGame(){
 
 
 /* =========================================================
-   HOST — END GAME
+   END GAME
 ========================================================= */
 
 async function endGame(){
 
-  if(!game){
+  if(game){
 
-    location.reload();
-
-    return;
+    await sb
+      .from("games")
+      .update({
+        status:"Finished"
+      })
+      .eq(
+        "id",
+        game.id
+      );
 
   }
-
-
-  await sb
-    .from("games")
-    .update({
-      status:"Finished"
-    })
-    .eq("id",game.id);
 
 
   location.reload();
@@ -1354,19 +1275,26 @@ async function endGame(){
 
 
 /* =========================================================
-   PLAYER — JOIN
+   JOIN GAME
 ========================================================= */
 
 async function joinGame(){
 
   const pin =
-    $("joinPin").value.trim();
+    $("joinPin")
+      .value
+      .trim();
 
   const nickname =
-    $("nickname").value.trim();
+    $("nickname")
+      .value
+      .trim();
 
 
-  if(!pin || !nickname){
+  if(
+    !pin ||
+    !nickname
+  ){
 
     msg(
       "joinMsg",
@@ -1385,7 +1313,10 @@ async function joinGame(){
     await sb
       .from("games")
       .select("*")
-      .eq("game_pin",pin)
+      .eq(
+        "game_pin",
+        pin
+      )
       .maybeSingle();
 
 
@@ -1401,7 +1332,9 @@ async function joinGame(){
   }
 
 
-  if(g.status !== "Waiting"){
+  if(
+    g.status !== "Waiting"
+  ){
 
     msg(
       "joinMsg",
@@ -1431,8 +1364,6 @@ async function joinGame(){
 
   if(e){
 
-    console.error(e);
-
     msg(
       "joinMsg",
       "Could not join: " +
@@ -1445,6 +1376,7 @@ async function joinGame(){
 
 
   game = g;
+
   player = p;
 
 
@@ -1456,106 +1388,265 @@ async function joinGame(){
 
 
   /*
-    Listen for changes to this game.
-
-    This is what allows the player to receive:
-    - game started
-    - question changed
-    - game finished
+    Realtime listener
   */
 
-  playerChannel =
-    sb
-      .channel("player-game-" + g.id)
-
-      .on(
-        "postgres_changes",
-        {
-          event:"UPDATE",
-          schema:"public",
-          table:"games",
-          filter:"id=eq." + g.id
-        },
-        async payload => {
-
-          const oldGame =
-            game;
-
-          game =
-            payload.new;
+  subscribeToPlayerGame();
 
 
-          /*
-            GAME STARTED
-          */
+  /*
+    Backup polling.
+    This is deliberately here so the player
+    doesn't get stuck if Supabase realtime
+    misses an UPDATE event.
+  */
 
-          if(
-            game.status === "Playing" &&
-            oldGame.status !== "Playing"
-          ){
-
-            await loadPlayerQuestions();
-
-            return;
-
-          }
-
-
-          /*
-            HOST MOVED TO ANOTHER QUESTION
-          */
-
-          if(
-            game.status === "Playing" &&
-            oldGame.status === "Playing" &&
-            game.current_question !==
-              oldGame.current_question
-          ){
-
-            currentIndex =
-              Number(
-                game.current_question ?? 0
-              );
-
-
-            showPlayerQuestion();
-
-            return;
-
-          }
-
-
-          /*
-            GAME FINISHED
-          */
-
-          if(
-            game.status === "Finished"
-          ){
-
-            show("finished");
-
-            $("finalScore").textContent =
-              player.score ?? 0;
-
-            $("finalText").textContent =
-              "Thanks for playing!";
-
-          }
-
-        }
-      )
-
-      .subscribe();
+  startPlayerGameWatcher();
 
 }
 
 
 /* =========================================================
-   PLAYER — LOAD QUESTIONS
+   PLAYER REALTIME
 ========================================================= */
 
-async function loadPlayerQuestions(){
+function subscribeToPlayerGame(){
+
+  sb
+    .channel(
+      "player-game-" +
+      game.id +
+      "-" +
+      player.id
+    )
+
+    .on(
+      "postgres_changes",
+      {
+        event:"UPDATE",
+        schema:"public",
+        table:"games",
+        filter:
+          "id=eq." + game.id
+      },
+      payload => {
+
+        console.log(
+          "PLAYER REALTIME GAME UPDATE:",
+          payload.new
+        );
+
+        handlePlayerGameUpdate(
+          payload.new
+        );
+
+      }
+    )
+
+    .subscribe();
+
+}
+
+
+/* =========================================================
+   PLAYER BACKUP WATCHER
+========================================================= */
+
+function startPlayerGameWatcher(){
+
+  if(playerWatcher){
+
+    clearInterval(
+      playerWatcher
+    );
+
+  }
+
+
+  playerWatcher =
+    setInterval(
+      async () => {
+
+        if(
+          !game ||
+          !player
+        ){
+
+          return;
+
+        }
+
+
+        const {
+          data,
+          error
+        } =
+          await sb
+            .from("games")
+            .select("*")
+            .eq(
+              "id",
+              game.id
+            )
+            .single();
+
+
+        if(error){
+
+          console.error(
+            "PLAYER GAME CHECK ERROR:",
+            error
+          );
+
+          return;
+
+        }
+
+
+        handlePlayerGameUpdate(
+          data
+        );
+
+      },
+      1000
+    );
+
+}
+
+
+/* =========================================================
+   PLAYER GAME UPDATE
+========================================================= */
+
+async function handlePlayerGameUpdate(
+  newGame
+){
+
+  if(!newGame)
+    return;
+
+
+  const oldStatus =
+    game?.status;
+
+  const oldQuestion =
+    Number(
+      game?.current_question ?? 0
+    );
+
+
+  game =
+    newGame;
+
+
+  const newQuestion =
+    Number(
+      game.current_question ?? 0
+    );
+
+
+  /*
+    HOST STARTED GAME
+  */
+
+  if(
+    game.status === "Playing" &&
+    oldStatus !== "Playing"
+  ){
+
+    console.log(
+      "PLAYER: Host started game"
+    );
+
+
+    await loadPlayerQuestions(
+      newQuestion
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    HOST MOVED TO ANOTHER QUESTION
+  */
+
+  if(
+    game.status === "Playing" &&
+    oldStatus === "Playing" &&
+    newQuestion !== oldQuestion
+  ){
+
+    console.log(
+      "PLAYER: Host moved from question",
+      oldQuestion,
+      "to",
+      newQuestion
+    );
+
+
+    currentIndex =
+      newQuestion;
+
+
+    showPlayerQuestion();
+
+
+    return;
+
+  }
+
+
+  /*
+    GAME FINISHED
+  */
+
+  if(
+    game.status === "Finished"
+  ){
+
+    if(
+      playerWatcher
+    ){
+
+      clearInterval(
+        playerWatcher
+      );
+
+      playerWatcher = null;
+
+    }
+
+
+    show("finished");
+
+
+    $("finalScore").textContent =
+      player.score ?? 0;
+
+
+    $("finalText").textContent =
+      "Thanks for playing!";
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD PLAYER QUESTIONS
+========================================================= */
+
+async function loadPlayerQuestions(
+  requestedIndex = 0
+){
+
+  console.log(
+    "PLAYER: Loading questions..."
+  );
+
 
   const {
     data,
@@ -1564,23 +1655,49 @@ async function loadPlayerQuestions(){
     await sb
       .from("questions")
       .select("*")
-      .eq("quiz_id",game.quiz_id)
+      .eq(
+        "quiz_id",
+        game.quiz_id
+      )
       .order("id");
 
 
+  console.log(
+    "PLAYER QUESTIONS:",
+    data
+  );
+
+
+  if(error){
+
+    console.error(
+      "PLAYER QUESTION ERROR:",
+      error
+    );
+
+
+    msg(
+      "playerLobby",
+      "Could not load questions: " +
+      esc(error.message)
+    );
+
+
+    return;
+
+  }
+
+
   if(
-    error ||
-    !data?.length
+    !data ||
+    !data.length
   ){
-
-    console.error(error);
-
-    show("playerLobby");
 
     msg(
       "playerLobby",
       "No questions are available for this quiz."
     );
+
 
     return;
 
@@ -1591,14 +1708,9 @@ async function loadPlayerQuestions(){
     data;
 
 
-  /*
-    Use the question number saved in Supabase.
-    DO NOT reset this to zero blindly.
-  */
-
   currentIndex =
     Number(
-      game.current_question ?? 0
+      requestedIndex
     );
 
 
@@ -1608,22 +1720,32 @@ async function loadPlayerQuestions(){
 
 
 /* =========================================================
-   PLAYER — SHOW QUESTION
+   SHOW PLAYER QUESTION
 ========================================================= */
 
 function showPlayerQuestion(){
 
+  console.log(
+    "PLAYER: Showing question",
+    currentIndex + 1
+  );
+
+
   if(
-    currentIndex >= questions.length
+    currentIndex >=
+    questions.length
   ){
 
     show("finished");
 
+
     $("finalScore").textContent =
       player.score ?? 0;
 
+
     $("finalText").textContent =
       "Thanks for playing!";
+
 
     return;
 
@@ -1634,12 +1756,25 @@ function showPlayerQuestion(){
     questions[currentIndex];
 
 
-  answerLocked =
-    false;
+  answerLocked = false;
 
 
   const options =
-    getOptions(currentQuestion);
+    getOptions(
+      currentQuestion
+    );
+
+
+  console.log(
+    "PLAYER QUESTION DATA:",
+    currentQuestion
+  );
+
+
+  console.log(
+    "PLAYER OPTIONS:",
+    options
+  );
 
 
   $("playerQNumber").textContent =
@@ -1650,7 +1785,9 @@ function showPlayerQuestion(){
 
 
   $("playerQuestionText").textContent =
-    getText(currentQuestion);
+    getText(
+      currentQuestion
+    );
 
 
   $("playerScore").textContent =
@@ -1668,14 +1805,16 @@ function showPlayerQuestion(){
   $("playerOptions").innerHTML =
     options
       .map(
-        (option,index) => `
-          <button
-            class="answer ${colors[index] || ""}"
-            onclick="submitAnswer(${index})"
-          >
-            ${esc(option)}
-          </button>
-        `
+        (o,i) =>
+          '<button ' +
+          'class="answer ' +
+          colors[i] +
+          '" ' +
+          'onclick="submitAnswer(' +
+          i +
+          ')">' +
+          esc(o) +
+          "</button>"
       )
       .join("");
 
@@ -1683,50 +1822,59 @@ function showPlayerQuestion(){
   $("playerMsg").innerHTML =
     "";
 
+
+  /*
+    IMPORTANT:
+    This is what switches the player
+    from "You're in!" to the actual question.
+  */
+
+  show("playerQuestion");
+
 }
 
 
 /* =========================================================
-   PLAYER — ANSWER
+   SUBMIT ANSWER
 ========================================================= */
 
-async function submitAnswer(index){
+async function submitAnswer(i){
 
-  if(answerLocked){
-
+  if(answerLocked)
     return;
 
-  }
 
-
-  answerLocked =
-    true;
+  answerLocked = true;
 
 
   const options =
-    getOptions(currentQuestion);
+    getOptions(
+      currentQuestion
+    );
 
 
   const selected =
-    String(options[index]);
+    String(
+      options[i]
+    );
 
 
   const correct =
-    getCorrect(currentQuestion);
+    getCorrect(
+      currentQuestion
+    );
 
 
   const isCorrect =
     selected === correct ||
-    String(index) === correct;
+    String(i) === correct;
 
 
   const points =
-    isCorrect ? 10 : 0;
+    isCorrect
+      ? 10
+      : 0;
 
-
-  /*
-    Save answer
-  */
 
   const {
     error
@@ -1753,24 +1901,21 @@ async function submitAnswer(index){
         response_time:
           0,
 
-        points:
-          points
+        points
 
       });
 
 
   if(error){
 
-    console.error(error);
-
     $("playerMsg").innerHTML =
       '<div class="msg">' +
-      'Could not save answer: ' +
+      "Could not save answer: " +
       esc(error.message) +
-      '</div>';
+      "</div>";
 
-    answerLocked =
-      false;
+
+    answerLocked = false;
 
     return;
 
@@ -1778,7 +1923,7 @@ async function submitAnswer(index){
 
 
   /*
-    Update score
+    Update local score
   */
 
   const newScore =
@@ -1786,44 +1931,27 @@ async function submitAnswer(index){
     points;
 
 
-  const newStreak =
-    isCorrect
-      ? (player.streak || 0) + 1
-      : 0;
-
-
   player.score =
     newScore;
 
-  player.streak =
-    newStreak;
 
-
-  const {
-    error:scoreError
-  } =
-    await sb
-      .from("players")
-      .update({
-        score:newScore,
-        streak:newStreak
-      })
-      .eq(
-        "id",
-        player.id
-      );
-
-
-  if(scoreError){
-
-    console.error(scoreError);
-
-  }
+  await sb
+    .from("players")
+    .update({
+      score:newScore,
+      streak:
+        isCorrect
+          ? (player.streak || 0) + 1
+          : 0
+    })
+    .eq(
+      "id",
+      player.id
+    );
 
 
   /*
-    Lock all answers
-    and visually show result.
+    Disable answer buttons
   */
 
   document
@@ -1831,56 +1959,24 @@ async function submitAnswer(index){
       "#playerOptions button"
     )
     .forEach(
-      (button,index) => {
+      (button,j) => {
 
         button.disabled =
           true;
 
-        if(index === index){
 
-          if(
-            index ===
-            Number(correct)
-          ){
+        if(j === i){
 
-            button.classList.add(
-              "correct"
-            );
-
-          }
+          button.classList.add(
+            isCorrect
+              ? "correct"
+              : "wrong"
+          );
 
         }
 
       }
     );
-
-
-  /*
-    Make sure the selected answer
-    is visually marked correctly.
-  */
-
-  const buttons =
-    document.querySelectorAll(
-      "#playerOptions button"
-    );
-
-
-  buttons.forEach(
-    (button,buttonIndex) => {
-
-      if(buttonIndex === index){
-
-        button.classList.add(
-          isCorrect
-            ? "correct"
-            : "wrong"
-        );
-
-      }
-
-    }
-  );
 
 
   $("playerScore").textContent =
@@ -1888,53 +1984,34 @@ async function submitAnswer(index){
 
 
   $("playerMsg").innerHTML =
-    `
-      <div class="msg">
-        ${
-          isCorrect
-            ? "✅ Correct! +10 points"
-            : "❌ Not quite. +0 points"
-        }
+    '<div class="msg">' +
 
-        <br>
+    (
+      isCorrect
+        ? "✅ Correct! +10 points"
+        : "❌ Not quite. +0 points"
+    ) +
 
-        <span class="small">
-          Waiting for the host to continue...
-        </span>
-      </div>
-    `;
+    "<br><br>" +
+
+    "Waiting for the host to move to the next question..." +
+
+    "</div>";
 
 
   /*
     IMPORTANT:
+    DO NOT advance the question here.
 
-    We DO NOT move to the next question here.
-
-    The HOST controls the question.
+    The HOST controls the question number.
   */
 
 }
 
 
 /* =========================================================
-   PREVENT ACCIDENTAL FORM SUBMISSION
+   END
 ========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event => {
-
-    if(
-      event.key === "Enter" &&
-      document.activeElement.tagName === "INPUT"
-    ){
-
-      event.preventDefault();
-
-    }
-
-  }
-);
 
 </script>
 
