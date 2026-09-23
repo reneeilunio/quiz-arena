@@ -3,457 +3,247 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quiz Arena — Account Recovery Training</title>
+<title>Quiz Arena</title>
 <style>
-*{box-sizing:border-box}
-:root{--bg:#080a18;--card:#11152b;--card2:#171b36;--text:#f6f7ff;--muted:#a8aecb;--line:#2b3158;--accent:#7c5cff;--good:#32d583;--bad:#ff5c7a;--gold:#ffd166}
-body{margin:0;background:radial-gradient(circle at top,#17183c 0,#080a18 55%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
-button,input{font:inherit}
-button{cursor:pointer}
-.app{width:min(1050px,94%);margin:auto;padding:28px 0 50px}
-.screen{display:none}.screen.active{display:block}
-.card{background:rgba(17,21,43,.94);border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,.28)}
-.center{text-align:center}
-.logo{font-weight:900;letter-spacing:.08em;font-size:clamp(34px,7vw,66px);line-height:1}
-.subtitle{color:var(--muted);font-size:18px;margin:12px 0 28px}
-.btn{border:0;border-radius:14px;padding:15px 22px;background:var(--accent);color:white;font-weight:800;min-height:52px;transition:.15s}
-.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
-.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
-.btn.secondary{background:#24294c}
-.btn.good{background:var(--good);color:#06140d}
-.btn.danger{background:var(--bad)}
-.stack{display:grid;gap:12px;max-width:440px;margin:auto}
-.input{width:100%;padding:16px;border-radius:14px;border:1px solid var(--line);background:#0c0f21;color:white;text-align:center;outline:none}
-.input:focus{border-color:var(--accent)}
-.pin{font-size:52px;font-weight:900;letter-spacing:.12em;margin:18px 0;color:var(--gold)}
-.pill{display:inline-block;border:1px solid var(--line);background:#0d1022;border-radius:999px;padding:9px 14px;color:var(--muted)}
-.msg{min-height:25px;margin:15px 0;color:var(--muted)}
-.error{color:#ff9aab}
-.goodtext{color:#72e7aa}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
-.small{font-size:13px;color:var(--muted)}
-.qmeta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
-.timer{font-size:28px;font-weight:900;color:var(--gold)}
-.progress{height:8px;background:#24294c;border-radius:99px;overflow:hidden;margin-bottom:26px}
-.progress>div{height:100%;background:var(--accent);width:0;transition:.2s}
-.question{font-size:clamp(24px,4vw,38px);font-weight:800;line-height:1.18;margin:20px 0 28px}
-.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.answer{border:1px solid var(--line);background:var(--card2);color:white;border-radius:16px;padding:20px;text-align:left;font-weight:700;min-height:76px}
-.answer:hover{border-color:#7564e8;background:#202650}
-.answer.selected{border-color:#9a8aff}
-.answer.correct{background:rgba(50,213,131,.15);border-color:var(--good)}
-.answer.wrong{background:rgba(255,92,122,.15);border-color:var(--bad)}
-.feedback{text-align:center;min-height:58px;margin-top:18px;font-weight:800}
-.leaderboard{display:grid;gap:9px;margin:18px auto;max-width:650px}
-.row{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;padding:13px 15px;border:1px solid var(--line);border-radius:14px;background:#0d1022}
-.rank{font-weight:900;color:var(--gold)}.name{text-align:left}.score{font-weight:900}
-.status{font-size:15px;color:var(--muted);margin:8px 0}
-.resultbox{padding:18px;border-radius:16px;background:#0d1022;border:1px solid var(--line);margin:18px 0}
-@media(max-width:650px){.answers{grid-template-columns:1fr}.card{padding:20px}.topbar{align-items:flex-start}}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#070a18;color:#fff;min-height:100vh}.wrap{max-width:900px;margin:auto;padding:28px 18px}.card{background:#11162d;border:1px solid #293154;border-radius:18px;padding:30px;box-shadow:0 20px 60px #0005}h1{font-size:46px;letter-spacing:2px;text-align:center;margin:10px 0 4px}.sub{text-align:center;color:#9da7ca;margin-bottom:28px}button{border:0;border-radius:10px;padding:13px 18px;font-weight:700;cursor:pointer;background:#7657ff;color:#fff;width:100%;margin-top:10px}button.secondary{background:#252c52}button:disabled{opacity:.55;cursor:not-allowed}input{width:100%;padding:14px;border-radius:10px;border:1px solid #394264;background:#090d20;color:#fff;font-size:16px;margin:6px 0 10px}label{font-size:13px;color:#aeb7d8}.hidden{display:none!important}.center{text-align:center}.pin{font-size:58px;letter-spacing:8px;font-weight:800;text-align:center;margin:18px 0}.players{display:grid;gap:8px;margin-top:18px}.player{background:#1a2040;padding:12px 15px;border-radius:10px;display:flex;justify-content:space-between}.msg{padding:12px;background:#191f3c;border-radius:10px;color:#cbd3f3;margin:12px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.option{text-align:left;background:#242c53;border:1px solid #394264}.correct{background:#17734d!important}.wrong{background:#9b3048!important}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.small{font-size:13px;color:#aeb7d8}.score{font-size:34px;font-weight:800;text-align:center}@media(max-width:600px){.grid{grid-template-columns:1fr}h1{font-size:36px}.pin{font-size:44px}}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="wrap">
 
-<section id="home" class="screen active">
-  <div class="card center">
-    <div class="logo">QUIZ ARENA</div>
-    <div class="subtitle">Account Recovery Training · 10 Questions</div>
-    <div class="stack">
-      <button class="btn" id="hostBtn">👑 Host a Game</button>
-      <button class="btn secondary" id="joinBtn">🎮 Join a Game</button>
-    </div>
-    <div class="msg" id="homeMsg"></div>
-  </div>
-</section>
+<div class="card" id="home">
+<h1>QUIZ ARENA</h1>
+<div class="sub">Account Recovery Training · 10 Questions</div>
+<button onclick="show('hostSetup')">Host a Game</button>
+<button class="secondary" onclick="show('join')">Join a Game</button>
+</div>
 
-<section id="host" class="screen">
-  <div class="card center">
-    <div class="logo" style="font-size:42px">👑 HOST</div>
-    <div class="subtitle">Create a room and share the PIN.</div>
-    <button class="btn" id="createBtn">Create Game</button>
-    <div id="hostInfo"></div>
-    <div class="status" id="hostStatus"></div>
-    <div id="hostPlayers" class="leaderboard"></div>
-    <div class="stack">
-      <button class="btn good" id="startBtn" hidden>START GAME 🚀</button>
-      <button class="btn secondary" id="hostBack">Back</button>
-    </div>
-  </div>
-</section>
+<div class="card hidden" id="hostSetup">
+<h2>Host a Game</h2>
+<label>Quiz ID</label><input id="quizId" type="number" value="1" min="1">
+<button onclick="createGame()">Create Game</button>
+<button class="secondary" onclick="show('home')">Back</button>
+<div id="hostSetupMsg"></div>
+</div>
 
-<section id="join" class="screen">
-  <div class="card center">
-    <div class="logo" style="font-size:42px">🎮 JOIN</div>
-    <div class="subtitle">Enter the Game PIN and your nickname.</div>
-    <div class="stack">
-      <input class="input" id="pinInput" inputmode="numeric" maxlength="8" placeholder="Game PIN">
-      <input class="input" id="nameInput" maxlength="20" placeholder="Nickname">
-      <button class="btn" id="joinGame">Join Game</button>
-      <button class="btn secondary" id="joinBack">Back</button>
-    </div>
-    <div class="msg" id="joinMsg"></div>
-  </div>
-</section>
+<div class="card hidden" id="hostLobby">
+<div class="top"><h2>Waiting Room</h2><span class="small">Quiz ID: <b id="hostQuizId"></b></span></div>
+<div class="small">GAME PIN</div><div class="pin" id="hostPin"></div>
+<div class="small">Players</div><div class="players" id="hostPlayers"></div>
+<button onclick="startGame()">START GAME</button>
+<button class="secondary" onclick="location.reload()">End Game</button>
+<div id="hostMsg"></div>
+</div>
 
-<section id="waiting" class="screen">
-  <div class="card center">
-    <div class="logo" style="font-size:42px">WAITING ROOM</div>
-    <div class="subtitle" id="waitingText">Waiting for the host…</div>
-    <div class="pin" id="waitingPin">------</div>
-    <div class="small">Game PIN</div>
-    <div id="waitingPlayers" class="leaderboard"></div>
-  </div>
-</section>
+<div class="card hidden" id="hostQuestion">
+<div class="top"><h2>Live Game</h2><span class="small" id="hostQCount"></span></div>
+<h2 id="hostQuestionText"></h2>
+<div id="hostOptions" class="grid"></div>
+<div class="msg" id="hostAnswers">Waiting for players...</div>
+<button onclick="nextHostQuestion()">NEXT QUESTION</button>
+</div>
 
-<section id="game" class="screen">
-  <div class="card">
-    <div class="topbar">
-      <div>
-        <div class="small" id="playerLabel"></div>
-        <div class="small" id="questionNumber"></div>
-      </div>
-      <div class="timer" id="timer">10</div>
-    </div>
-    <div class="progress"><div id="progressBar"></div></div>
-    <div class="question" id="questionText">Loading…</div>
-    <div class="answers" id="answerButtons"></div>
-    <div class="feedback" id="feedback"></div>
-  </div>
-</section>
+<div class="card hidden" id="join">
+<h2>Join a Game</h2>
+<label>Game PIN</label><input id="joinPin" maxlength="6" placeholder="482731">
+<label>Nickname</label><input id="nickname" maxlength="24" placeholder="Renee">
+<button onclick="joinGame()">JOIN GAME</button>
+<button class="secondary" onclick="show('home')">Back</button>
+<div id="joinMsg"></div>
+</div>
 
-<section id="results" class="screen">
-  <div class="card center">
-    <div class="logo" style="font-size:48px">🏆 RESULTS</div>
-    <div class="subtitle" id="resultSubtitle"></div>
-    <div class="resultbox">
-      <div class="small">YOUR SCORE</div>
-      <div style="font-size:52px;font-weight:900" id="finalScore">0</div>
-    </div>
-    <div id="finalLeaderboard" class="leaderboard"></div>
-    <button class="btn secondary" id="homeAgain">Back to Home</button>
-  </div>
-</section>
+<div class="card hidden" id="playerLobby">
+<div class="center"><h2>You're in! 🎉</h2><div class="pin" id="playerPin"></div><p class="small">Waiting for the host to start the game...</p></div>
+</div>
+
+<div class="card hidden" id="playerQuestion">
+<div class="top"><h2 id="playerQNumber"></h2><span class="small">Score: <b id="playerScore">0</b></span></div>
+<h2 id="playerQuestionText"></h2>
+<div id="playerOptions"></div>
+<div id="playerMsg"></div>
+</div>
+
+<div class="card hidden" id="finished">
+<div class="center"><h1>GAME COMPLETE</h1><div class="score" id="finalScore"></div><p id="finalText"></p><button onclick="location.reload()">Back to Home</button></div>
+</div>
 
 </div>
 
 <script>
-const SUPABASE_URL = "https://ozcjuthexxpctkbknfcs.supabase.co";
-const SUPABASE_KEY = "sb_publishable_BxgDOAcICXk48EmmyvBjiQ_oTsvQ_Ax";
+const SUPABASE_URL="https://ozcjuthexxpctkbknfcs.supabase.co";
+const SUPABASE_KEY="sb_publishable_BxgDOAcICXk48EmmyvBjiQ_oTsvQ_Ax";
 
-let game = null;
-let player = null;
-let questions = [];
-let questionIndex = 0;
-let timer = null;
-let timeLeft = 0;
-let answered = false;
-let poll = null;
+let sb,game=null,player=null,questions=[],currentIndex=0,currentQuestion=null,answerLocked=false;
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll(".card").forEach(x=>x.classList.add("hidden"));$(id).classList.remove("hidden")}
+function msg(id,text){$(id).innerHTML='<div class="msg">'+text+'</div>'}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 
-async function api(path, options={}) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    ...options,
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    }
-  });
-  const text = await res.text();
-  if (!res.ok) {
-    let detail = text;
-    try { detail = JSON.parse(text).message || JSON.parse(text).hint || text; } catch {}
-    throw new Error(detail);
-  }
-  return text ? JSON.parse(text) : null;
+async function init(){
+ const s=document.createElement("script");
+ s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+ document.head.appendChild(s);
+ await new Promise((resolve,reject)=>{s.onload=resolve;s.onerror=reject});
+ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+}
+init().catch(()=>alert("Could not load Supabase. Check your internet connection."));
+
+function randomPin(){return String(Math.floor(100000+Math.random()*900000))}
+
+async function createGame(){
+ const quiz_id=Number($("quizId").value||1),game_pin=randomPin();
+ const {data,error}=await sb.from("games").insert({quiz_id,game_pin,status:"Waiting"}).select().single();
+ if(error){msg("hostSetupMsg","Could not create game: "+esc(error.message));return}
+ game=data;
+ $("hostPin").textContent=game_pin;
+ $("hostQuizId").textContent=quiz_id;
+ show("hostLobby");
+ subscribeToGame();
+ loadPlayers();
 }
 
-function show(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  $(id).classList.add("active");
+async function loadPlayers(){
+ const {data,error}=await sb.from("players").select("*").eq("game_id",game.id).order("created_at");
+ if(error){$("hostPlayers").innerHTML='<div class="msg">'+esc(error.message)+"</div>";return}
+ $("hostPlayers").innerHTML=data?.length
+ ?data.map(p=>'<div class="player"><span>👤 '+esc(p.nickname)+'</span><b>'+(p.score??0)+"</b></div>").join("")
+ :'<div class="msg">Waiting for players...</div>';
 }
 
-function escapeHtml(v) {
-  return String(v).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
+function subscribeToGame(){
+ sb.channel("game-"+game.id)
+ .on("postgres_changes",{event:"*",schema:"public",table:"players",filter:"game_id=eq."+game.id},()=>loadPlayers())
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"games",filter:"id=eq."+game.id},payload=>{
+   game=payload.new;
+ })
+ .subscribe();
 }
 
-function setError(el, message) {
-  el.textContent = message;
-  el.className = "msg error";
+async function startGame(){
+ const {data,error}=await sb.from("questions").select("*").eq("quiz_id",game.quiz_id).order("id");
+ if(error){msg("hostMsg","Could not load questions: "+esc(error.message));return}
+ questions=data||[];
+ if(!questions.length){msg("hostMsg","No questions found for Quiz ID "+game.quiz_id+". Add questions first.");return}
+ await sb.from("games").update({status:"Playing"}).eq("id",game.id);
+ currentIndex=0;
+ hostShowQuestion();
 }
 
-async function loadQuestions() {
-  questions = await api(
-    "questions?select=id,question_text,answer_a,answer_b,answer_c,answer_d,correct_answer,time_limit&quiz_id=eq.1&order=id.asc"
-  );
-  if (!questions || questions.length < 10) {
-    throw new Error(`Supabase returned ${questions?.length || 0} questions. We need 10.`);
-  }
-  questions = questions.slice(0,10);
+function getText(q){return q.question_text??q.question??q.text??q.prompt??"Question"}
+function getOptions(q){
+ if(Array.isArray(q.options))return q.options;
+ if(typeof q.options==="string"){try{const x=JSON.parse(q.options);if(Array.isArray(x))return x}catch(e){}}
+ return [q.option_a,q.option_b,q.option_c,q.option_d].filter(x=>x!==undefined&&x!==null);
+}
+function getCorrect(q){return String(q.correct_answer??q.correct_option??q.answer??q.correct??"").trim()}
+
+function hostShowQuestion(){
+ if(currentIndex>=questions.length){finishGame();return}
+ currentQuestion=questions[currentIndex];
+ $("hostQCount").textContent="Question "+(currentIndex+1)+" of "+questions.length;
+ $("hostQuestionText").textContent=getText(currentQuestion);
+ $("hostOptions").innerHTML=getOptions(currentQuestion).map(o=>'<button class="option" disabled>'+esc(o)+"</button>").join("");
+ loadAnswerCount();
 }
 
-async function createGame() {
-  await loadQuestions();
-  const pin = String(Math.floor(100000 + Math.random()*900000));
-
-  const rows = await api("games", {
-    method:"POST",
-    headers:{"Prefer":"return=representation"},
-    body:JSON.stringify({quiz_id:1, game_pin:pin, status:"waiting"})
-  });
-
-  game = rows[0];
-  $("hostInfo").innerHTML = `<div class="pin">${escapeHtml(pin)}</div><div class="small">Share this PIN with your players.</div>`;
-  $("hostStatus").textContent = "Waiting for players…";
-  $("startBtn").hidden = false;
-  await refreshPlayers("hostPlayers");
-  beginPolling();
+async function loadAnswerCount(){
+ const {data}=await sb.from("answers").select("id,player_id,is_correct").eq("game_id",game.id).eq("question_id",currentQuestion.id);
+ const {count}=await sb.from("players").select("id",{count:"exact",head:true}).eq("game_id",game.id);
+ $("hostAnswers").textContent="Answers: "+(data?.length||0)+" / "+(count||0);
 }
 
-async function findGame(pin) {
-  const rows = await api(`games?select=id,quiz_id,game_pin,status&game_pin=eq.${encodeURIComponent(pin)}&limit=1`);
-  if (!rows.length) throw new Error("Game PIN not found.");
-  if (rows[0].status !== "waiting") throw new Error("That game has already started.");
-  return rows[0];
+function nextHostQuestion(){
+ currentIndex++;
+ hostShowQuestion();
 }
 
-async function joinGame() {
-  const pin = $("pinInput").value.trim();
-  const nickname = $("nameInput").value.trim();
-  if (!pin || !nickname) {
-    setError($("joinMsg"), "Please enter both the Game PIN and nickname.");
-    return;
-  }
-
-  try {
-    const found = await findGame(pin);
-    const existing = await api(`players?select=id&game_id=eq.${found.id}&nickname=eq.${encodeURIComponent(nickname)}&limit=1`);
-    if (existing.length) throw new Error("That nickname is already in this game.");
-
-    const rows = await api("players", {
-      method:"POST",
-      headers:{"Prefer":"return=representation"},
-      body:JSON.stringify({game_id:found.id,nickname,score:0,streak:0})
-    });
-
-    game = found;
-    player = rows[0];
-
-    $("waitingPin").textContent = found.game_pin;
-    $("waitingText").textContent = `You're in, ${nickname}! Waiting for the host to start…`;
-    show("waiting");
-    await refreshPlayers("waitingPlayers");
-    beginPolling();
-  } catch(e) {
-    setError($("joinMsg"), e.message || "Could not join the game.");
-  }
+async function finishGame(){
+ await sb.from("games").update({status:"Finished"}).eq("id",game.id);
+ show("finished");
+ $("finalScore").textContent="Game complete!";
+ $("finalText").textContent="Final scores are saved in the players table.";
 }
 
-async function refreshPlayers(target) {
-  if (!game) return;
-  const rows = await api(`players?select=id,nickname,score,streak&game_id=eq.${game.id}&order=score.desc,created_at.asc`);
-  $(target).innerHTML = rows.length
-    ? rows.map((p,i)=>`<div class="row"><span class="rank">${i+1}</span><span class="name">${escapeHtml(p.nickname)}</span><span class="score">${p.score}</span></div>`).join("")
-    : `<div class="small">No players yet.</div>`;
+async function joinGame(){
+ const pin=$("joinPin").value.trim(),nickname=$("nickname").value.trim();
+ if(!pin||!nickname){msg("joinMsg","Enter both the game PIN and a nickname.");return}
+ const {data:g,error}=await sb.from("games").select("*").eq("game_pin",pin).maybeSingle();
+ if(error||!g){msg("joinMsg","Game not found. Check the PIN.");return}
+ if(g.status!=="Waiting"){msg("joinMsg","That game has already started or ended.");return}
+ const {data:p,error:e}=await sb.from("players").insert({game_id:g.id,nickname,score:0,streak:0}).select().single();
+ if(e){msg("joinMsg","Could not join: "+esc(e.message));return}
+ game=g;player=p;
+ $("playerPin").textContent=pin;
+ show("playerLobby");
+
+ sb.channel("player-game-"+g.id)
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"games",filter:"id=eq."+g.id},payload=>{
+   game=payload.new;
+   if(game.status==="Playing")loadPlayerQuestions();
+   if(game.status==="Finished")show("finished");
+ })
+ .subscribe();
 }
 
-function beginPolling() {
-  stopPolling();
-  poll = setInterval(checkGameState, 1200);
+async function loadPlayerQuestions(){
+ const {data,error}=await sb.from("questions").select("*").eq("quiz_id",game.quiz_id).order("id");
+ if(error||!data?.length){msg("playerLobby","No questions are available for this quiz.");return}
+ questions=data;currentIndex=0;showPlayerQuestion();
 }
 
-function stopPolling() {
-  if (poll) clearInterval(poll);
-  poll = null;
+function showPlayerQuestion(){
+ if(currentIndex>=questions.length){
+   show("finished");
+   $("finalScore").textContent="Thanks for playing!";
+   return;
+ }
+ currentQuestion=questions[currentIndex];
+ answerLocked=false;
+ const opts=getOptions(currentQuestion);
+ $("playerQNumber").textContent="Question "+(currentIndex+1)+" of "+questions.length;
+ $("playerQuestionText").textContent=getText(currentQuestion);
+ $("playerScore").textContent=player.score??0;
+ $("playerOptions").innerHTML=opts.map((o,i)=>'<button class="option" onclick="submitAnswer('+i+')">'+esc(o)+"</button>").join("");
+ $("playerMsg").innerHTML="";
 }
 
-async function checkGameState() {
-  if (!game) return;
-  try {
-    const rows = await api(`games?select=id,quiz_id,game_pin,status& id=eq.${game.id}`.replace("status& id","status&id"));
-    if (!rows.length) return;
-    game = rows[0];
+async function submitAnswer(i){
+ if(answerLocked)return;
+ answerLocked=true;
 
-    if ($("host").classList.contains("active")) {
-      await refreshPlayers("hostPlayers");
-    }
+ const opts=getOptions(currentQuestion),selected=String(opts[i]),correct=getCorrect(currentQuestion);
+ const isCorrect=selected===correct||String(i)===correct;
+ const points=isCorrect?10:0;
 
-    if ($("waiting").classList.contains("active")) {
-      await refreshPlayers("waitingPlayers");
-      if (game.status === "started" && player) {
-        stopPolling();
-        await startPlayerQuiz();
-      }
-    }
-  } catch(e) {
-    console.error(e);
-  }
+ const {error}=await sb.from("answers").insert({
+   question_id:currentQuestion.id,
+   selected_answer:selected,
+   is_correct:isCorrect,
+   game_id:game.id,
+   player_id:player.id,
+   response_time:0,
+   points
+ });
+
+ if(error){
+   $("playerMsg").innerHTML='<div class="msg">Could not save answer: '+esc(error.message)+"</div>";
+   answerLocked=false;
+   return;
+ }
+
+ const newScore=(player.score||0)+points;
+ player.score=newScore;
+ await sb.from("players").update({score:newScore,streak:isCorrect?(player.streak||0)+1:0}).eq("id",player.id);
+
+ document.querySelectorAll("#playerOptions button").forEach((b,j)=>{
+   b.disabled=true;
+   if(j===i)b.classList.add(isCorrect?"correct":"wrong");
+ });
+ $("playerMsg").innerHTML='<div class="msg">'+(isCorrect?"✅ Correct! +10 points":"❌ Not quite. +0 points")+"</div>";
+
+ setTimeout(()=>{currentIndex++;showPlayerQuestion()},900);
 }
-
-async function startHostGame() {
-  if (!game) return;
-  await api(`games?id=eq.${game.id}`, {
-    method:"PATCH",
-    headers:{"Prefer":"return=minimal"},
-    body:JSON.stringify({status:"started"})
-  });
-  $("hostStatus").textContent = "Game started! Players are answering…";
-  $("startBtn").disabled = true;
-}
-
-async function startPlayerQuiz() {
-  await loadQuestions();
-  questionIndex = 0;
-  $("playerLabel").textContent = `${player.nickname} · PIN ${game.game_pin}`;
-  show("game");
-  renderQuestion();
-}
-
-function renderQuestion() {
-  answered = false;
-  clearInterval(timer);
-
-  const q = questions[questionIndex];
-  const limit = Number(q.time_limit) || 10;
-  timeLeft = limit;
-
-  $("questionNumber").textContent = `Question ${questionIndex+1} of ${questions.length}`;
-  $("progressBar").style.width = `${((questionIndex)/questions.length)*100}%`;
-  $("questionText").textContent = q.question_text;
-  $("feedback").textContent = "";
-  $("feedback").className = "feedback";
-  $("timer").textContent = timeLeft;
-
-  const opts = [
-    ["A",q.answer_a],["B",q.answer_b],["C",q.answer_c],["D",q.answer_d]
-  ];
-
-  $("answerButtons").innerHTML = opts.map(([letter,text]) =>
-    `<button class="answer" data-answer="${escapeHtml(text)}">
-      <strong>${letter}.</strong> ${escapeHtml(text)}
-    </button>`
-  ).join("");
-
-  document.querySelectorAll(".answer").forEach(btn => {
-    btn.addEventListener("click", () => submitAnswer(btn.dataset.answer));
-  });
-
-  timer = setInterval(() => {
-    timeLeft--;
-    $("timer").textContent = Math.max(0,timeLeft);
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      submitAnswer(null);
-    }
-  },1000);
-}
-
-async function submitAnswer(selected) {
-  if (answered) return;
-  answered = true;
-  clearInterval(timer);
-
-  const q = questions[questionIndex];
-  const correct = selected !== null && selected === q.correct_answer;
-  const responseTime = (Number(q.time_limit)||10) - Math.max(0,timeLeft);
-  const points = correct ? 100 + Math.max(0,timeLeft)*10 : 0;
-
-  document.querySelectorAll(".answer").forEach(btn => {
-    btn.disabled = true;
-    if (btn.dataset.answer === q.correct_answer) btn.classList.add("correct");
-    if (selected && btn.dataset.answer === selected && !correct) btn.classList.add("wrong");
-  });
-
-  $("feedback").textContent = correct
-    ? `✓ Correct! +${points} points`
-    : `✕ Incorrect. Correct answer: ${q.correct_answer}`;
-  $("feedback").className = "feedback " + (correct ? "goodtext" : "error");
-
-  try {
-    await api("answers", {
-      method:"POST",
-      headers:{"Prefer":"return=minimal"},
-      body:JSON.stringify({
-        game_id:game.id,
-        player_id:player.id,
-        question_id:q.id,
-        selected_answer:selected,
-        is_correct:correct,
-        response_time:responseTime,
-        points
-      })
-    });
-
-    const current = await api(`players?select=score,streak&id=eq.${player.id}&limit=1`);
-    const oldScore = current[0]?.score || 0;
-    const oldStreak = current[0]?.streak || 0;
-
-    await api(`players?id=eq.${player.id}`, {
-      method:"PATCH",
-      headers:{"Prefer":"return=minimal"},
-      body:JSON.stringify({
-        score: oldScore + points,
-        streak: correct ? oldStreak + 1 : 0
-      })
-    });
-
-    player.score = oldScore + points;
-  } catch(e) {
-    $("feedback").textContent = "Answer could not be saved: " + e.message;
-    $("feedback").className = "feedback error";
-  }
-
-  setTimeout(() => {
-    if (questionIndex < questions.length - 1) {
-      questionIndex++;
-      renderQuestion();
-    } else {
-      finishPlayer();
-    }
-  }, 1200);
-}
-
-async function finishPlayer() {
-  show("results");
-  $("finalScore").textContent = player.score || 0;
-  $("resultSubtitle").textContent = "Great job! Final leaderboard:";
-  await refreshPlayers("finalLeaderboard");
-
-  try {
-    const everyone = await api(`players?select=id,nickname,score&game_id=eq.${game.id}&order=score.desc`);
-    const rank = everyone.findIndex(p => p.id === player.id) + 1;
-    $("resultSubtitle").textContent = `You finished #${rank} with ${player.score || 0} points.`;
-  } catch {}
-}
-
-$("hostBtn").onclick = () => { show("host"); $("hostInfo").innerHTML=""; $("hostPlayers").innerHTML=""; $("startBtn").hidden=true; };
-$("joinBtn").onclick = () => { show("join"); $("joinMsg").textContent=""; };
-$("hostBack").onclick = () => { stopPolling(); game=null; show("home"); };
-$("joinBack").onclick = () => { stopPolling(); game=null; player=null; show("home"); };
-$("createBtn").onclick = async () => {
-  $("createBtn").disabled=true;
-  $("createBtn").textContent="Creating…";
-  try { await createGame(); }
-  catch(e) { setError($("hostStatus"), e.message || "Could not create game."); }
-  finally { $("createBtn").disabled=false; $("createBtn").textContent="Create Game"; }
-};
-$("joinGame").onclick = joinGame;
-$("startBtn").onclick = async () => {
-  $("startBtn").disabled=true;
-  try { await startHostGame(); }
-  catch(e) { $("hostStatus").textContent="Could not start game: "+e.message; $("startBtn").disabled=false; }
-};
-$("homeAgain").onclick = () => {
-  stopPolling(); game=null; player=null; questionIndex=0;
-  show("home");
-};
-
-window.addEventListener("beforeunload", stopPolling);
 </script>
 </body>
 </html>
