@@ -1201,6 +1201,26 @@ button.host-style-button:disabled {
   transform: translateY(0) !important;
 }
 
+/* =========================================================
+   HOST QUESTION ACTIONS
+   ========================================================= */
+.host-question-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.host-question-actions .host-style-button{
+  margin:0 !important;
+}
+
+@media(max-width:600px){
+  .host-question-actions{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 
@@ -1383,9 +1403,25 @@ button.host-style-button:disabled {
     Waiting for players...
   </div>
 
-  <button onclick="showHostLeaderboardThenNext()">
-    SHOW LEADERBOARD
-  </button>
+  <div class="host-question-actions">
+    <button
+      class="host-style-button"
+      id="hostShowLeaderboardBtn"
+      type="button"
+      onclick="showHostLeaderboardThenNext()"
+    >
+      SHOW LEADERBOARD
+    </button>
+
+    <button
+      class="host-style-button"
+      id="hostNextQuestionBtn"
+      type="button"
+      onclick="startNextQuestionManually()"
+    >
+      START NEXT QUESTION →
+    </button>
+  </div>
 
 </div>
 
@@ -1403,6 +1439,17 @@ button.host-style-button:disabled {
   <div class="ranking" id="hostRanking"></div>
 
   <div class="leaderboard-countdown" id="hostLeaderboardCountdown"></div>
+
+  <div class="host-question-actions">
+    <button
+      class="host-style-button"
+      id="hostLeaderboardNextBtn"
+      type="button"
+      onclick="startNextQuestionManually()"
+    >
+      START NEXT QUESTION →
+    </button>
+  </div>
 
 </div>
 
@@ -2338,19 +2385,14 @@ function renderRanking(containerId, players, currentPlayerId=null, showAll=false
 
 async function showHostLeaderboardThenNext(){
 
-  // The leaderboard has its own transition lock. Do NOT use
-  // isAdvancingQuestion here because nextHostQuestion() needs
-  // to acquire that lock when it actually advances the game.
-  if(leaderboardInterval) return;
+  if(leaderboardInterval || isAdvancingQuestion) return;
 
   clearHostTimer();
   clearLeaderboardTimers();
 
-  // Give the final answer/score update a moment to reach Supabase.
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, 350));
 
   const players = await fetchLeaderboard();
-
   renderRanking("hostRanking", players, null, true);
 
   const afterQuestion = currentIndex + 1;
@@ -2366,17 +2408,24 @@ async function showHostLeaderboardThenNext(){
       ? `Next question in ${LEADERBOARD_TIME}...`
       : "Game complete...";
 
+  const nextBtn = $("hostLeaderboardNextBtn");
+  if(nextBtn){
+    nextBtn.disabled = !hasNext;
+    nextBtn.textContent = hasNext
+      ? "START NEXT QUESTION →"
+      : "GAME COMPLETE";
+  }
+
   show("hostLeaderboard");
 
-  // For the final question, there is nothing else to advance to.
   if(!hasNext){
+    refreshLeaderboardAnimation();
     return;
   }
 
   let remaining = LEADERBOARD_TIME;
 
   leaderboardInterval = setInterval(async () => {
-
     remaining--;
 
     const countdown = $("hostLeaderboardCountdown");
@@ -2386,14 +2435,9 @@ async function showHostLeaderboardThenNext(){
 
     if(remaining <= 0){
       clearLeaderboardTimers();
-
-      // Move to the next question directly. Do NOT reset the lock here;
-      // nextHostQuestion owns the lock during the database update.
       await nextHostQuestion(true);
     }
-
   }, 1000);
-
 
   refreshLeaderboardAnimation();
 }
@@ -2483,6 +2527,19 @@ function hostShowQuestion(){
 
   loadAnswerCount();
 
+  const hostNextBtn = $("hostNextQuestionBtn");
+  const hostLeaderboardBtn = $("hostShowLeaderboardBtn");
+  if(hostNextBtn){
+    hostNextBtn.disabled = false;
+    hostNextBtn.textContent =
+      currentIndex === questions.length - 1
+        ? "FINISH GAME →"
+        : "START NEXT QUESTION →";
+  }
+  if(hostLeaderboardBtn){
+    hostLeaderboardBtn.disabled = false;
+  }
+
   // Actually switch the host from the lobby to the live question.
   show("hostQuestion");
 
@@ -2548,6 +2605,36 @@ async function loadAnswerCount(){
 
 
 /* =========================================================
+   MANUAL NEXT QUESTION
+   ========================================================= */
+async function startNextQuestionManually(){
+  if(!game || !questions.length || isAdvancingQuestion) return;
+
+  if(currentIndex >= questions.length - 1){
+    await finishGame();
+    return;
+  }
+
+  clearHostTimer();
+  clearLeaderboardTimers();
+
+  const buttons = document.querySelectorAll(
+    "#hostNextQuestionBtn, #hostLeaderboardNextBtn, #hostShowLeaderboardBtn"
+  );
+  buttons.forEach(button => {
+    button.disabled = true;
+  });
+
+  try{
+    await nextHostQuestion(false);
+  }finally{
+    buttons.forEach(button => {
+      button.disabled = false;
+    });
+  }
+}
+
+/* =========================================================
    NEXT QUESTION
 ========================================================= */
 
@@ -2556,6 +2643,7 @@ async function nextHostQuestion(fromTimer = false){
   if(isAdvancingQuestion) return;
   isAdvancingQuestion = true;
   clearHostTimer();
+  clearLeaderboardTimers();
 
   currentIndex++;
 
@@ -3497,7 +3585,7 @@ async function submitAnswer(i){
 <script>
 
 /* ===== LIVE RANK / LEADERBOARD ANIMATION ===== */
-let previousLeaderboardOrder = [];
+const previousLeaderboardOrders = new Map();
 
 function animateLeaderboardRows(root){
   if(!root) return;
@@ -3514,6 +3602,8 @@ function animateLeaderboardRows(root){
     rank: index + 1
   }));
 
+  const key = root.id || "leaderboard";
+  const previousLeaderboardOrder = previousLeaderboardOrders.get(key) || [];
   const oldRank = new Map(
     previousLeaderboardOrder.map((x, i) => [x.id, i + 1])
   );
@@ -3541,7 +3631,7 @@ function animateLeaderboardRows(root){
 
   });
 
-  previousLeaderboardOrder = current.map(x => ({id:x.id}));
+  previousLeaderboardOrders.set(key, current.map(x => ({id:x.id})));
   setTimeout(() => {
     rows.forEach(row => row.classList.remove(
       "leaderboard-moving",
@@ -3569,7 +3659,6 @@ function refreshLeaderboardAnimation(){
 }
 
 
-<script>
 /* =========================================================
    FINAL CANONICAL POINTER HANDLER
    The same hover behavior is applied to every action button,
