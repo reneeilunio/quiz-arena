@@ -1130,6 +1130,77 @@ button.host-style-button:disabled {
   cursor: not-allowed !important;
   opacity: .6 !important;
 }
+
+/* =========================================================
+   FINAL CANONICAL ACTION BUTTON SYSTEM
+   HOME + HOST SETUP + JOIN
+   Highest-specificity rules so legacy styles cannot override them.
+   ========================================================= */
+
+#home button.host-style-button,
+#hostSetup button.host-style-button,
+#join button.host-style-button {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  margin: 10px 0 0 !important;
+  padding: 14px 18px !important;
+  border: 1px solid rgba(181,138,58,.42) !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, #fffdf7 0%, #f2e7d4 100%) !important;
+  color: #2b2520 !important;
+  font-family: inherit !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  box-shadow: 0 4px 12px rgba(54,42,27,.08) !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  transition:
+    background .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .12s ease !important;
+}
+
+/* EXACT SAME HOVER STATE ON ALL SIX BUTTONS */
+#home button.host-style-button:hover,
+#home button.host-style-button.is-hovered,
+#hostSetup button.host-style-button:hover,
+#hostSetup button.host-style-button.is-hovered,
+#join button.host-style-button:hover,
+#join button.host-style-button.is-hovered {
+  background: #252d59 !important;
+  color: #ffffff !important;
+  border-color: #252d59 !important;
+  box-shadow: 0 8px 20px rgba(37,45,89,.24) !important;
+  transform: translateY(-1px) !important;
+  filter: none !important;
+}
+
+#home button.host-style-button:hover *,
+#home button.host-style-button.is-hovered *,
+#hostSetup button.host-style-button:hover *,
+#hostSetup button.host-style-button.is-hovered *,
+#join button.host-style-button:hover *,
+#join button.host-style-button.is-hovered * {
+  color: #ffffff !important;
+}
+
+#home button.host-style-button:active,
+#hostSetup button.host-style-button:active,
+#join button.host-style-button:active {
+  background: #1b2447 !important;
+  color: #ffffff !important;
+  border-color: #1b2447 !important;
+  box-shadow: 0 4px 10px rgba(27,36,71,.22) !important;
+  transform: translateY(0) !important;
+}
+
 </style>
 </head>
 
@@ -3499,28 +3570,85 @@ function refreshLeaderboardAnimation(){
 
 
 <script>
-/* ONE hover system for Home, Host Setup, and Join. */
-document.querySelectorAll('button.host-style-button').forEach(function (button) {
-  button.addEventListener('pointerenter', function () {
-    if (!button.disabled) button.classList.add('is-hovered');
-  });
-  button.addEventListener('pointerleave', function () {
-    button.classList.remove('is-hovered');
-  });
-});
+/* =========================================================
+   FINAL CANONICAL POINTER HANDLER
+   The same hover behavior is applied to every action button,
+   regardless of which screen is currently visible.
+   ========================================================= */
+(function () {
+  const SELECTOR =
+    '#home button.host-style-button, #hostSetup button.host-style-button, #join button.host-style-button';
 
-/* Buttons are rendered statically, but this also covers buttons created later. */
-document.addEventListener('pointerover', function (event) {
-  const button = event.target.closest('button.host-style-button');
-  if (button && !button.disabled) button.classList.add('is-hovered');
-});
-document.addEventListener('pointerout', function (event) {
-  const button = event.target.closest('button.host-style-button');
-  if (!button) return;
-  if (!event.relatedTarget || !button.contains(event.relatedTarget)) {
-    button.classList.remove('is-hovered');
+  const NORMAL = {
+    background: 'linear-gradient(180deg, #fffdf7 0%, #f2e7d4 100%)',
+    color: '#2b2520',
+    borderColor: 'rgba(181,138,58,.42)',
+    boxShadow: '0 4px 12px rgba(54,42,27,.08)',
+    transform: 'none'
+  };
+
+  const HOVER = {
+    background: '#252d59',
+    color: '#ffffff',
+    borderColor: '#252d59',
+    boxShadow: '0 8px 20px rgba(37,45,89,.24)',
+    transform: 'translateY(-1px)'
+  };
+
+  function paint(button, state) {
+    if (!button || button.disabled) return;
+    const c = state === 'hover' ? HOVER : NORMAL;
+
+    button.style.setProperty('background', c.background, 'important');
+    button.style.setProperty('color', c.color, 'important');
+    button.style.setProperty('border-color', c.borderColor, 'important');
+    button.style.setProperty('box-shadow', c.boxShadow, 'important');
+    button.style.setProperty('transform', c.transform, 'important');
+
+    if (state === 'hover') {
+      button.classList.add('is-hovered');
+    } else {
+      button.classList.remove('is-hovered');
+    }
   }
-});
+
+  // Paint all buttons normal initially.
+  document.querySelectorAll(SELECTOR).forEach(function (button) {
+    paint(button, 'normal');
+  });
+
+  // Delegated pointer handling means it works even when screens are shown/hidden.
+  document.addEventListener('pointerover', function (event) {
+    const button = event.target.closest && event.target.closest(SELECTOR);
+    if (!button) return;
+
+    // Ignore movement between children inside the same button.
+    if (event.relatedTarget && button.contains(event.relatedTarget)) return;
+
+    paint(button, 'hover');
+  }, true);
+
+  document.addEventListener('pointerout', function (event) {
+    const button = event.target.closest && event.target.closest(SELECTOR);
+    if (!button) return;
+
+    // Ignore movement between children inside the same button.
+    if (event.relatedTarget && button.contains(event.relatedTarget)) return;
+
+    paint(button, 'normal');
+  }, true);
+
+  // Keyboard focus gets the same visual state for consistency.
+  document.addEventListener('focusin', function (event) {
+    const button = event.target.closest && event.target.closest(SELECTOR);
+    if (button) paint(button, 'hover');
+  });
+
+  document.addEventListener('focusout', function (event) {
+    const button = event.target.closest && event.target.closest(SELECTOR);
+    if (button) paint(button, 'normal');
+  });
+})();
 </script>
 
 </body>
