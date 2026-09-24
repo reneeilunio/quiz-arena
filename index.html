@@ -675,10 +675,534 @@ textarea::placeholder{
 }
 
 
+
+/* ===== FINAL ANSWER/HIGHLIGHT STYLE ===== */
+/* Normal = warm gallery paper. Highlight = deep museum blue. */
+.answer,
+.answer-grid button,
+#playerOptions button,
+#hostOptions button,
+.option,
+.answer-option{
+  color:#2b2520 !important;
+  background:#fffaf0 !important;
+  border:1px solid rgba(181,138,58,.38) !important;
+  transition:
+    background .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.answer:hover,
+.answer:focus-visible,
+.answer:active,
+.answer-grid button:hover,
+.answer-grid button:focus-visible,
+#playerOptions button:hover,
+#playerOptions button:focus-visible,
+#hostOptions button:hover,
+#hostOptions button:focus-visible,
+.option:hover,
+.option:focus-visible,
+.answer-option:hover,
+.answer-option:focus-visible{
+  color:#fffaf0 !important;
+  background:#1b2447 !important;
+  border-color:#b58a3a !important;
+  box-shadow:0 8px 22px rgba(27,36,71,.24) !important;
+  transform:translateY(-1px);
+}
+
+/* Keep the chosen/correct/wrong states meaningful after submission. */
+.answer.correct,
+.answer-grid button.correct,
+#playerOptions button.correct,
+.answer-option.correct{
+  color:#fffaf0 !important;
+  background:#66745b !important;
+  border-color:#66745b !important;
+}
+
+.answer.wrong,
+.answer-grid button.wrong,
+#playerOptions button.wrong,
+.answer-option.wrong{
+  color:#fffaf0 !important;
+  background:#8f4d3d !important;
+  border-color:#8f4d3d !important;
+}
+
+/* Small music control */
+.music-toggle{
+  position:fixed;
+  top:16px;
+  right:16px;
+  z-index:9999;
+  width:auto !important;
+  margin:0 !important;
+  padding:9px 13px !important;
+  border-radius:999px !important;
+  color:#fffaf0 !important;
+  background:#1b2447 !important;
+  border:1px solid rgba(181,138,58,.65) !important;
+  box-shadow:0 6px 18px rgba(27,36,71,.18) !important;
+  font-size:12px !important;
+}
+.music-toggle:hover{
+  color:#fffaf0 !important;
+  background:#26335f !important;
+}
+
+
+/* ===== FINAL BUTTON + LEADERBOARD POLISH ===== */
+
+/* Answer/action buttons: parchment at rest, deep museum navy on pointer hover */
+button,
+button.answer,
+#playerOptions button,
+#hostQuestion button,
+#hostQuestionOptions button,
+#playerQuestion button,
+#playerOptions .answer,
+#home button,
+#host button,
+#join button{
+  color:#2b2520 !important;
+  background:linear-gradient(180deg,#fffdf8 0%,#f7edda 100%) !important;
+  border:1px solid rgba(109,63,69,.18) !important;
+  transition:
+    background .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease !important;
+}
+
+button:hover,
+button:focus-visible,
+button.answer:hover,
+button.answer:focus-visible,
+#playerOptions button:hover,
+#playerOptions button:focus-visible,
+#hostQuestion button:hover,
+#hostQuestion button:focus-visible,
+#playerQuestion button:hover,
+#playerQuestion button:focus-visible{
+  color:#ffffff !important;
+  background:#252d59 !important;
+  border-color:#252d59 !important;
+  box-shadow:0 8px 20px rgba(37,45,89,.24) !important;
+  transform:translateY(-1px);
+}
+
+/* Selected answer stays navy + white even after the mouse leaves */
+button.selected,
+button:active,
+#playerOptions button.selected{
+  color:#ffffff !important;
+  background:#252d59 !important;
+  border-color:#252d59 !important;
+}
+
+/* Don't let disabled buttons inherit the hover treatment */
+button:disabled{
+  color:#8b8175 !important;
+  background:#e9dfcf !important;
+  border-color:#d8cbb8 !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+/* ===== LEADERBOARD ROWS ===== */
+.rank-row{
+  position:relative;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:64px 1fr auto;
+  align-items:center;
+  gap:14px;
+  color:#2b2520 !important;
+  background:linear-gradient(180deg,#fffdf8 0%,#f7edda 100%) !important;
+  border:1px solid rgba(109,63,69,.18) !important;
+  border-radius:16px;
+  padding:14px 18px;
+  margin:8px 0;
+  box-shadow:0 5px 15px rgba(54,42,27,.08);
+  transition:transform .55s cubic-bezier(.2,.8,.2,1),
+             background .35s ease,
+             color .2s ease,
+             border-color .35s ease,
+             box-shadow .35s ease;
+}
+
+.rank-row:hover{
+  color:#ffffff !important;
+  background:#252d59 !important;
+  border-color:#252d59 !important;
+}
+
+.rank-row:hover .rank-name,
+.rank-row:hover .rank-score,
+.rank-row:hover .rank-number,
+.rank-row:hover .small{
+  color:#ffffff !important;
+}
+
+.rank-row[data-rank="1"]{
+  border-color:rgba(181,138,58,.65) !important;
+  background:linear-gradient(90deg,rgba(181,138,58,.15),#fffdf8) !important;
+}
+
+.rank-row[data-rank="1"]:hover{
+  background:#252d59 !important;
+  border-color:#252d59 !important;
+}
+
+.rank-number{
+  color:#6d3f45 !important;
+  font-weight:800;
+}
+
+.rank-score{
+  color:#6d3f45 !important;
+  font-weight:900;
+}
+
+.rank-row.leaderboard-moving{
+  z-index:5;
+  background:linear-gradient(90deg,rgba(181,138,58,.28),#fffdf8,rgba(168,91,61,.12)) !important;
+  border-color:rgba(181,138,58,.75) !important;
+  box-shadow:0 10px 30px rgba(181,138,58,.24);
+}
+
+.rank-row.leaderboard-up{
+  animation:rankUp .85s ease;
+}
+
+.rank-row.leaderboard-down{
+  animation:rankDown .85s ease;
+}
+
+.rank-row.leaderboard-same{
+  animation:rankGlow .7s ease;
+}
+
+/* Player leaderboard's waiting line */
+#playerLeaderboardCountdown,
+#hostLeaderboardCountdown{
+  color:#756b60 !important;
+  background:transparent !important;
+}
+
+/* ===== LEADERBOARD CARD ===== */
+#hostLeaderboard,
+#playerLeaderboard{
+  background:#fffaf0 !important;
+  color:#2b2520 !important;
+  border-color:rgba(109,63,69,.20) !important;
+}
+
+#hostLeaderboard .leaderboard-title,
+#playerLeaderboard .leaderboard-title{
+  color:#2b2520 !important;
+}
+
+#hostLeaderboard .leaderboard-subtitle,
+#playerLeaderboard .leaderboard-subtitle{
+  color:#8a769e !important;
+}
+
+
+/* ===== CONSISTENT INTERACTION / HOVER SYSTEM ===== */
+/* Every interactive control uses the same gallery-paper -> museum-blue hover. */
+button:not(:disabled),
+.btn:not(:disabled),
+input:not(:disabled),
+select:not(:disabled),
+textarea:not(:disabled){
+  transition:
+    background .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+button:not(:disabled):hover,
+button:not(:disabled):focus-visible,
+.btn:not(:disabled):hover,
+.btn:not(:disabled):focus-visible{
+  color:#ffffff !important;
+  background:#252d59 !important;
+  border-color:#252d59 !important;
+  box-shadow:0 8px 20px rgba(37,45,89,.24) !important;
+  transform:translateY(-1px);
+}
+
+button:not(:disabled):active,
+.btn:not(:disabled):active{
+  color:#ffffff !important;
+  background:#1b2447 !important;
+  border-color:#1b2447 !important;
+  transform:translateY(0);
+}
+
+/* Answer choices use the exact same hover treatment. */
+.answer:not(:disabled):hover,
+.answer:not(:disabled):focus-visible,
+.answer-grid button:not(:disabled):hover,
+.answer-grid button:not(:disabled):focus-visible,
+#playerOptions button:not(:disabled):hover,
+#playerOptions button:not(:disabled):focus-visible,
+#hostOptions button:not(:disabled):hover,
+#hostOptions button:not(:disabled):focus-visible{
+  color:#ffffff !important;
+  background:#252d59 !important;
+  border-color:#b58a3a !important;
+}
+
+/* Leaderboard rows are non-button interactive elements, so give them the same hover. */
+.rank-row:hover,
+.rank-row:focus-within{
+  color:#ffffff !important;
+  background:#252d59 !important;
+  border-color:#252d59 !important;
+  box-shadow:0 8px 20px rgba(37,45,89,.24) !important;
+}
+
+.rank-row:hover .rank-name,
+.rank-row:hover .rank-score,
+.rank-row:hover .rank-number,
+.rank-row:hover .small,
+.rank-row:focus-within .rank-name,
+.rank-row:focus-within .rank-score,
+.rank-row:focus-within .rank-number,
+.rank-row:focus-within .small{
+  color:#ffffff !important;
+}
+
+/* Music toggle follows the same museum-blue interaction, without moving the fixed control. */
+.music-toggle:not(:disabled):hover,
+.music-toggle:not(:disabled):focus-visible{
+  color:#ffffff !important;
+  background:#252d59 !important;
+  border-color:#b58a3a !important;
+  transform:translateY(-1px);
+}
+
+/* Disabled controls stay visually disabled and never receive hover styling. */
+button:disabled,
+.btn:disabled{
+  transform:none !important;
+  cursor:not-allowed;
+}
+
+
+/* Consistent interaction style for all menu/action buttons */
+.menu-button,
+button.menu-button,
+#hostGameBtn,
+#joinGameBtn,
+.host-game-btn,
+.join-game-btn {
+  background: #fffaf0 !important;
+  color: #171717 !important;
+  border: 1px solid #e5d7bc !important;
+  transition: background-color .18s ease, color .18s ease,
+              border-color .18s ease, transform .12s ease,
+              box-shadow .18s ease !important;
+  cursor: pointer;
+}
+
+.menu-button:hover,
+button.menu-button:hover,
+#hostGameBtn:hover,
+#joinGameBtn:hover,
+.host-game-btn:hover,
+.join-game-btn:hover {
+  background: #252d59 !important;
+  color: #ffffff !important;
+  border-color: #252d59 !important;
+  box-shadow: 0 6px 16px rgba(37, 45, 89, .18) !important;
+}
+
+.menu-button:hover *,
+button.menu-button:hover *,
+#hostGameBtn:hover *,
+#joinGameBtn:hover *,
+.host-game-btn:hover *,
+.join-game-btn:hover * {
+  color: #ffffff !important;
+}
+
+.menu-button:active,
+button.menu-button:active,
+#hostGameBtn:active,
+#joinGameBtn:active,
+.host-game-btn:active,
+.join-game-btn:active {
+  background: #1d2448 !important;
+  color: #ffffff !important;
+  transform: translateY(1px);
+}
+
+.menu-button:focus-visible,
+button.menu-button:focus-visible,
+#hostGameBtn:focus-visible,
+#joinGameBtn:focus-visible,
+.host-game-btn:focus-visible,
+.join-game-btn:focus-visible {
+  outline: 2px solid #252d59;
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   CANONICAL HOST-STYLE BUTTONS
+   Home + Host Setup + Join use the exact same button class.
+   ========================================================= */
+button.host-style-button {
+  width: 100% !important;
+  margin-top: 10px !important;
+  padding: 14px 18px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(181,138,58,.42) !important;
+  background: linear-gradient(180deg,#fffdf7,#f2e7d4) !important;
+  color: #2b2520 !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(54,42,27,.08) !important;
+  transition:
+    background-color .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    transform .12s ease,
+    box-shadow .18s ease !important;
+  filter: none !important;
+}
+
+button.host-style-button:hover {
+  background: #252d59 !important;
+  color: #ffffff !important;
+  border-color: #252d59 !important;
+  box-shadow: 0 6px 16px rgba(37,45,89,.18) !important;
+  transform: translateY(-1px);
+  filter: none !important;
+}
+
+button.host-style-button:active {
+  background: #1d2448 !important;
+  color: #ffffff !important;
+  border-color: #1d2448 !important;
+  transform: translateY(1px);
+}
+
+button.host-style-button:focus-visible {
+  outline: 2px solid #252d59;
+  outline-offset: 2px;
+}
+
+button.host-style-button:disabled {
+  background: #e9dfcf !important;
+  color: #8b8175 !important;
+  border-color: #d8cbb8 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  cursor: not-allowed !important;
+}
+
+
+/* =========================================================
+   FINAL CANONICAL MENU BUTTONS
+   Home + Host Setup + Join use one identical component.
+   No page-specific button styling should override this.
+   ========================================================= */
+button.host-style-button,
+button.host-style-button:visited{
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  width:100% !important;
+  min-height:44px !important;
+  margin:10px 0 0 !important;
+  padding:14px 18px !important;
+  border-radius:10px !important;
+  border:1px solid rgba(181,138,58,.42) !important;
+  outline:none !important;
+  background:linear-gradient(180deg,#fffdf7 0%,#f2e7d4 100%) !important;
+  color:#2b2520 !important;
+  font-family:inherit !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+  line-height:1.2 !important;
+  box-shadow:0 4px 12px rgba(54,42,27,.08) !important;
+  cursor:pointer !important;
+  transform:none !important;
+  filter:none !important;
+  opacity:1 !important;
+  transition:background .18s ease,color .18s ease,border-color .18s ease,
+             box-shadow .18s ease,transform .12s ease !important;
+}
+
+button.host-style-button:hover,
+button.host-style-button:focus-visible{
+  background:#252d59 !important;
+  color:#ffffff !important;
+  border-color:#252d59 !important;
+  box-shadow:0 8px 20px rgba(37,45,89,.24) !important;
+  transform:translateY(-1px) !important;
+  filter:none !important;
+}
+
+button.host-style-button:active{
+  background:#1b2447 !important;
+  color:#ffffff !important;
+  border-color:#1b2447 !important;
+  box-shadow:0 4px 10px rgba(27,36,71,.22) !important;
+  transform:translateY(0) !important;
+}
+
+button.host-style-button:disabled{
+  background:#e9dfcf !important;
+  color:#8b8175 !important;
+  border-color:#d8cbb8 !important;
+  box-shadow:none !important;
+  transform:none !important;
+  cursor:not-allowed !important;
+  opacity:.6 !important;
+}
+
+/* Make sure text inside the shared button always follows the same state. */
+button.host-style-button:hover *,
+button.host-style-button:focus-visible *,
+button.host-style-button:active *{
+  color:#ffffff !important;
+}
+
 </style>
 </head>
 
 <body>
+
+
+<!-- BACKGROUND MUSIC
+     Upload your music file to the repo at: music/art-appreciation.mp3 -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="music/art-appreciation.mp3" type="audio/mpeg">
+</audio>
+
+<button
+  id="musicToggle"
+  class="music-toggle hidden"
+  type="button"
+  onclick="toggleMusic()"
+  aria-label="Toggle background music"
+>
+  ♪ Music
+</button>
+
 
 <div class="wrap">
 
@@ -692,11 +1216,19 @@ textarea::placeholder{
     Group 2 Barometer · 10 Questions
   </div>
 
-  <button onclick="show('hostSetup')">
+  <button
+    class="host-style-button"
+    type="button"
+    onclick="startMusic(); show('hostSetup')"
+  >
     Host a Game
   </button>
 
-  <button class="secondary" onclick="show('join')">
+  <button
+    class="host-style-button"
+    type="button"
+    onclick="startMusic(); show('join')"
+  >
     Join a Game
   </button>
 
@@ -718,12 +1250,13 @@ textarea::placeholder{
     min="1"
   >
 
-  <button onclick="createGame()">
+  <button class="host-style-button" type="button" onclick="createGame()">
     Create Game
   </button>
 
   <button
-    class="secondary"
+    class="host-style-button"
+    type="button"
     onclick="show('home')"
   >
     Back
@@ -876,12 +1409,17 @@ textarea::placeholder{
     placeholder="Full Name"
   >
 
-  <button onclick="joinGame()">
+  <button
+    class="host-style-button"
+    type="button"
+    onclick="joinGame()"
+  >
     JOIN GAME
   </button>
 
   <button
-    class="secondary"
+    class="host-style-button"
+    type="button"
     onclick="show('home')"
   >
     Back
@@ -1010,6 +1548,47 @@ textarea::placeholder{
 
 
 <script>
+
+
+/* =========================================================
+   BACKGROUND MUSIC
+   Browser autoplay rules mean music starts after a user click.
+========================================================= */
+
+const bgMusic = document.getElementById("bgMusic");
+let musicStarted = false;
+
+function startMusic(){
+  if(!bgMusic) return;
+
+  bgMusic.volume = 0.28;
+
+  bgMusic.play()
+    .then(() => {
+      musicStarted = true;
+      const toggle = document.getElementById("musicToggle");
+      if(toggle){
+        toggle.classList.remove("hidden");
+        toggle.textContent = "♫ Music On";
+      }
+    })
+    .catch(() => {
+      // The music file has not been uploaded yet, or playback was blocked.
+    });
+}
+
+function toggleMusic(){
+  if(!bgMusic) return;
+
+  if(bgMusic.paused){
+    startMusic();
+  }else{
+    bgMusic.pause();
+    const toggle = document.getElementById("musicToggle");
+    if(toggle) toggle.textContent = "♪ Music Off";
+  }
+}
+
 
 /* =========================================================
    SUPABASE
@@ -1649,6 +2228,28 @@ function startPlayerTimer(){
       clearPlayerTimer();
       answerLocked = true;
       await showPlayerLeaderboard();
+
+      // The host owns the actual question transition.
+      // Keep the leaderboard visible briefly, then check the shared game state.
+      setTimeout(async () => {
+        if(!game || game.status !== "Playing") return;
+
+        const { data, error } = await sb
+          .from("games")
+          .select("*")
+          .eq("id", game.id)
+          .single();
+
+        if(error || !data) return;
+
+        const sharedQuestion = Number(data.current_question ?? currentIndex);
+
+        if(sharedQuestion !== currentIndex){
+          game = data;
+          currentIndex = sharedQuestion;
+          showPlayerQuestion();
+        }
+      }, 3500);
     }
 
   }, 1000);
@@ -1700,8 +2301,12 @@ function renderRanking(containerId, players, currentPlayerId=null, showAll=false
     const you = currentPlayerId && p.id === currentPlayerId;
 
     return `
-      <div class="rank-row ${you ? "you" : ""}">
-        <div class="rank-number">${medal}</div>
+      <div
+        class="rank-row leaderboard-row ${you ? "you" : ""}"
+        data-player-id="${esc(p.id)}"
+        data-rank="${index + 1}"
+      >
+        <div class="rank-number leaderboard-rank">${medal}</div>
         <div class="rank-name">${esc(p.nickname)}${you ? " <span class=\"small\">(You)</span>" : ""}</div>
         <div class="rank-score">${p.score ?? 0}</div>
       </div>
@@ -2914,12 +3519,6 @@ function animateLeaderboardRows(root){
       row.classList.add("leaderboard-same");
     }
 
-    const rankEl = row.querySelector(
-      ".leaderboard-rank, .rank, [data-rank]"
-    );
-    if(rankEl && !rankEl.dataset.locked){
-      rankEl.textContent = rank;
-    }
   });
 
   previousLeaderboardOrder = current.map(x => ({id:x.id}));
@@ -2932,7 +3531,6 @@ function animateLeaderboardRows(root){
     ));
   }, 1100);
 
-  refreshLeaderboardAnimation();
 }
 
 /*
@@ -2948,8 +3546,6 @@ function refreshLeaderboardAnimation(){
   ].filter(Boolean);
 
   candidates.forEach(animateLeaderboardRows);
-
-  refreshLeaderboardAnimation();
 }
 
 </script>
