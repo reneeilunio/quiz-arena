@@ -344,6 +344,337 @@ label{
 
 }
 
+
+/* ===== ART APPRECIATION THEME ===== */
+:root{
+  --art-ink:#25211d;
+  --art-paper:#f5efe3;
+  --art-paper-2:#fffaf0;
+  --art-gold:#b58a3a;
+  --art-terracotta:#a85b3d;
+  --art-sage:#66745b;
+  --art-wine:#6d3f45;
+  --art-shadow:0 18px 45px rgba(54,42,27,.14);
+}
+
+body{
+  background:
+    radial-gradient(circle at 15% 10%, rgba(181,138,58,.12), transparent 28%),
+    radial-gradient(circle at 85% 90%, rgba(168,91,61,.10), transparent 30%),
+    linear-gradient(135deg,#efe5d2 0%,#f8f2e7 48%,#e9dfcf 100%);
+  color:var(--art-ink);
+}
+
+.card, .panel, .quiz-card, .game-card{
+  background:rgba(255,250,240,.94);
+  border:1px solid rgba(181,138,58,.32);
+  box-shadow:var(--art-shadow);
+}
+
+.question-image{
+  border:8px solid #fffaf0;
+  outline:1px solid rgba(181,138,58,.45);
+  box-shadow:0 12px 28px rgba(54,42,27,.18);
+}
+
+.art-label{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--art-wine);
+  margin-bottom:8px;
+}
+.art-label::before{
+  content:"";
+  width:28px;
+  height:1px;
+  background:var(--art-gold);
+}
+
+/* ===== LIVE LEADERBOARD ===== */
+.leaderboard-row{
+  position:relative;
+  overflow:hidden;
+  transition:
+    transform .55s cubic-bezier(.2,.8,.2,1),
+    box-shadow .55s ease,
+    background .55s ease,
+    border-color .55s ease;
+}
+
+.leaderboard-row.leaderboard-moving{
+  z-index:5;
+  transform:scale(1.025);
+  background:linear-gradient(90deg,rgba(181,138,58,.18),rgba(255,250,240,.98),rgba(168,91,61,.10));
+  border-color:rgba(181,138,58,.72);
+  box-shadow:0 10px 30px rgba(181,138,58,.22);
+}
+
+.leaderboard-row.leaderboard-up{
+  animation:rankUp .85s ease;
+}
+
+.leaderboard-row.leaderboard-down{
+  animation:rankDown .85s ease;
+}
+
+.leaderboard-row.leaderboard-same{
+  animation:rankGlow .7s ease;
+}
+
+@keyframes rankUp{
+  0%{transform:translateY(12px) scale(.98);filter:brightness(1)}
+  45%{transform:translateY(-7px) scale(1.035);filter:brightness(1.12)}
+  100%{transform:translateY(0) scale(1);filter:brightness(1)}
+}
+
+@keyframes rankDown{
+  0%{transform:translateY(-12px) scale(.98);filter:brightness(1)}
+  45%{transform:translateY(7px) scale(1.015);filter:brightness(.98)}
+  100%{transform:translateY(0) scale(1);filter:brightness(1)}
+}
+
+@keyframes rankGlow{
+  0%{box-shadow:0 0 0 rgba(181,138,58,0)}
+  50%{box-shadow:0 0 28px rgba(181,138,58,.28)}
+  100%{box-shadow:0 0 0 rgba(181,138,58,0)}
+}
+
+.leaderboard-rank{
+  font-family:Georgia,"Times New Roman",serif;
+  color:var(--art-wine);
+}
+
+.leaderboard-row[data-rank="1"] .leaderboard-rank{
+  color:var(--art-gold);
+  font-size:1.15em;
+}
+
+.leaderboard-row[data-rank="1"]{
+  border-color:rgba(181,138,58,.65);
+  background:linear-gradient(90deg,rgba(181,138,58,.13),rgba(255,250,240,.96));
+}
+
+/* Small score-change flash */
+.score-delta{
+  position:absolute;
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+  font-weight:800;
+  color:var(--art-gold);
+  opacity:0;
+  pointer-events:none;
+}
+.score-delta.show{
+  animation:scorePop 1.05s ease forwards;
+}
+@keyframes scorePop{
+  0%{opacity:0;transform:translateY(5px) scale(.8)}
+  25%{opacity:1;transform:translateY(-50%) scale(1.15)}
+  100%{opacity:0;transform:translateY(-85%) scale(1)}
+}
+
+
+/* ===== FULL ART-APPRECIATION LIGHT UI ===== */
+:root{
+  --art-ink:#2b2520;
+  --art-paper:#fffaf0;
+  --art-paper-deep:#f1e6d2;
+  --art-gold:#b58a3a;
+  --art-terracotta:#a85b3d;
+  --art-sage:#66745b;
+  --art-wine:#6d3f45;
+  --art-border:rgba(109,63,69,.20);
+}
+
+/* Keep ALL primary UI controls light, not dark */
+button,
+.btn,
+button.primary,
+button.secondary,
+button.danger,
+button.success,
+input,
+select,
+textarea{
+  color:var(--art-ink) !important;
+  background:#fffaf0 !important;
+  border-color:var(--art-border) !important;
+  box-shadow:0 4px 12px rgba(54,42,27,.08);
+}
+
+button:hover,
+.btn:hover,
+button.primary:hover,
+button.secondary:hover,
+button.danger:hover,
+button.success:hover{
+  background:#f4ead8 !important;
+  border-color:rgba(181,138,58,.60) !important;
+  color:var(--art-wine) !important;
+}
+
+button:disabled,
+.btn:disabled{
+  color:#8b8175 !important;
+  background:#e9dfcf !important;
+  border-color:#d8cbb8 !important;
+}
+
+/* Dark-looking action/status controls */
+#hostStartGame,
+#hostNextQuestion,
+#hostEndGame,
+#playerSubmit,
+#playerLeave,
+#joinGame,
+#hostCreateGame,
+#hostReset,
+#hostBack,
+#playerBack,
+#nextQuestion,
+#startGame,
+.start-game,
+.next-question,
+.submit-answer,
+.action-button{
+  color:var(--art-ink) !important;
+  background:linear-gradient(180deg,#fffdf7,#f2e7d4) !important;
+  border:1px solid rgba(181,138,58,.42) !important;
+}
+
+/* Timer: make it look like a museum plaque, not a dark arcade widget */
+#hostTimer,
+#playerTimer,
+.timer,
+.timer-display,
+#timer{
+  color:var(--art-wine) !important;
+  background:#fffaf0 !important;
+  border:2px solid rgba(181,138,58,.42) !important;
+  box-shadow:0 6px 18px rgba(54,42,27,.10) !important;
+  text-shadow:none !important;
+}
+
+.timer.warning,
+.timer.danger,
+#hostTimer.warning,
+#playerTimer.warning,
+#hostTimer.danger,
+#playerTimer.danger{
+  color:#8f3f32 !important;
+  background:#fff3e8 !important;
+}
+
+/* Answer choices should stay readable and light */
+.answer-grid button,
+#playerOptions button,
+#hostOptions button,
+.option,
+.answer-option{
+  color:var(--art-ink) !important;
+  background:#fffaf0 !important;
+  border-color:rgba(109,63,69,.22) !important;
+}
+
+.answer-grid button:hover,
+#playerOptions button:hover,
+#hostOptions button:hover,
+.option:hover,
+.answer-option:hover{
+  background:#f5ead8 !important;
+  color:var(--art-wine) !important;
+}
+
+.answer-grid button.selected,
+#playerOptions button.selected,
+.answer-option.selected{
+  color:#fffaf0 !important;
+  background:var(--art-wine) !important;
+  border-color:var(--art-wine) !important;
+}
+
+.answer-grid button.correct,
+#playerOptions button.correct,
+.answer-option.correct{
+  color:#fffaf0 !important;
+  background:var(--art-sage) !important;
+  border-color:var(--art-sage) !important;
+}
+
+.answer-grid button.incorrect,
+#playerOptions button.incorrect,
+.answer-option.incorrect{
+  color:#fffaf0 !important;
+  background:var(--art-terracotta) !important;
+  border-color:var(--art-terracotta) !important;
+}
+
+/* Form fields */
+input::placeholder,
+textarea::placeholder{
+  color:#8b8175 !important;
+}
+
+/* Cards / panels */
+.card, .panel, .quiz-card, .game-card, .modal, .dialog{
+  background:rgba(255,250,240,.96) !important;
+  color:var(--art-ink) !important;
+  border-color:var(--art-border) !important;
+}
+
+/* Preserve readable text anywhere a dark utility class was used */
+.text-muted, .muted{
+  color:#756b60 !important;
+}
+
+
+/* ===== FINAL FIX: STATUS / ANSWER COUNT BARS ===== */
+/* These were using the old .msg dark background and therefore
+   stayed navy even after the rest of the theme changed. */
+.msg,
+#hostAnswers,
+#playerAnswers,
+#hostMsg,
+#hostSetupMsg,
+#joinMsg,
+#gameMsg{
+  color:var(--art-ink) !important;
+  background:linear-gradient(180deg,#fffdf8,#f3e8d6) !important;
+  border:1px solid rgba(181,138,58,.30) !important;
+  box-shadow:0 5px 16px rgba(54,42,27,.08) !important;
+}
+
+/* Waiting/answer status text */
+#hostAnswers,
+#playerAnswers{
+  border-left:4px solid var(--art-gold) !important;
+}
+
+/* Player waiting-list entries */
+.players,
+.player{
+  color:var(--art-ink) !important;
+}
+
+.player{
+  background:#fffaf0 !important;
+  border:1px solid rgba(109,63,69,.16) !important;
+}
+
+/* Any remaining dark utility blocks */
+[class*="status"],
+[class*="message"],
+[class*="answers-count"]{
+  color:var(--art-ink) !important;
+}
+
+
 </style>
 </head>
 
@@ -1249,6 +1580,8 @@ function clearLeaderboardTimers(){
     leaderboardInterval = null;
   }
 
+
+  refreshLeaderboardAnimation();
 }
 
 function startHostTimer(){
@@ -1340,6 +1673,8 @@ async function fetchLeaderboard(){
 
   return data || [];
 
+
+  refreshLeaderboardAnimation();
 }
 
 function renderRanking(containerId, players, currentPlayerId=null, showAll=false){
@@ -1434,6 +1769,8 @@ async function showHostLeaderboardThenNext(){
 
   }, 1000);
 
+
+  refreshLeaderboardAnimation();
 }
 
 async function showPlayerLeaderboard(){
@@ -1461,6 +1798,8 @@ async function showPlayerLeaderboard(){
 
   show("playerLeaderboard");
 
+
+  refreshLeaderboardAnimation();
 }
 
 /* =========================================================
@@ -2530,5 +2869,89 @@ async function submitAnswer(i){
 
 </script>
 
+<script>
+
+/* ===== LIVE RANK / LEADERBOARD ANIMATION ===== */
+let previousLeaderboardOrder = [];
+
+function animateLeaderboardRows(root){
+  if(!root) return;
+
+  const rows = [...root.querySelectorAll(
+    ".leaderboard-row, [data-player-id]"
+  )];
+
+  if(!rows.length) return;
+
+  const current = rows.map((row, index) => ({
+    row,
+    id: row.dataset.playerId || row.id || `row-${index}`,
+    rank: index + 1
+  }));
+
+  const oldRank = new Map(
+    previousLeaderboardOrder.map((x, i) => [x.id, i + 1])
+  );
+
+  current.forEach(({row,id,rank}) => {
+    const before = oldRank.get(id);
+
+    row.dataset.rank = rank;
+    row.classList.remove(
+      "leaderboard-moving",
+      "leaderboard-up",
+      "leaderboard-down",
+      "leaderboard-same"
+    );
+
+    if(before == null){
+      row.classList.add("leaderboard-moving","leaderboard-up");
+    }else if(rank < before){
+      row.classList.add("leaderboard-moving","leaderboard-up");
+    }else if(rank > before){
+      row.classList.add("leaderboard-moving","leaderboard-down");
+    }else{
+      row.classList.add("leaderboard-same");
+    }
+
+    const rankEl = row.querySelector(
+      ".leaderboard-rank, .rank, [data-rank]"
+    );
+    if(rankEl && !rankEl.dataset.locked){
+      rankEl.textContent = rank;
+    }
+  });
+
+  previousLeaderboardOrder = current.map(x => ({id:x.id}));
+  setTimeout(() => {
+    rows.forEach(row => row.classList.remove(
+      "leaderboard-moving",
+      "leaderboard-up",
+      "leaderboard-down",
+      "leaderboard-same"
+    ));
+  }, 1100);
+
+  refreshLeaderboardAnimation();
+}
+
+/*
+ * Call this immediately after your leaderboard HTML is rendered/re-sorted.
+ * It is also safe to call repeatedly after each question.
+ */
+function refreshLeaderboardAnimation(){
+  const candidates = [
+    document.getElementById("leaderboard"),
+    document.getElementById("hostLeaderboard"),
+    document.getElementById("playerLeaderboard"),
+    document.querySelector(".leaderboard")
+  ].filter(Boolean);
+
+  candidates.forEach(animateLeaderboardRows);
+
+  refreshLeaderboardAnimation();
+}
+
+</script>
 </body>
 </html>
