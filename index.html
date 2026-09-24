@@ -241,6 +241,25 @@ label{
   margin:30px 0 0;
 }
 
+.question-image-wrap{
+  display:none;
+  width:100%;
+  margin:24px 0;
+  text-align:center;
+}
+
+.question-image{
+  display:block;
+  max-width:100%;
+  max-height:400px;
+  width:auto;
+  height:auto;
+  margin:0 auto;
+  border-radius:14px;
+  object-fit:contain;
+}
+
+
 .question-number{
   font-size:14px;
   color:#aeb7d8;
@@ -459,6 +478,15 @@ label{
     id="hostQuestionText"
   ></h2>
 
+  <div class="question-image-wrap" id="hostQuestionImageWrap">
+    <img
+      id="hostQuestionImage"
+      class="question-image"
+      src=""
+      alt="Question image"
+    >
+  </div>
+
   <div
     id="hostOptions"
     class="grid"
@@ -506,7 +534,7 @@ label{
   <input
     id="joinPin"
     maxlength="6"
-    placeholder=""
+    placeholder="482731"
   >
 
   <label>Nickname</label>
@@ -514,7 +542,7 @@ label{
   <input
     id="nickname"
     maxlength="24"
-    placeholder="Your Full Name"
+    placeholder="Full Name"
   >
 
   <button onclick="joinGame()">
@@ -585,6 +613,15 @@ label{
     class="question-text"
     id="playerQuestionText"
   ></h2>
+
+  <div class="question-image-wrap" id="playerQuestionImageWrap">
+    <img
+      id="playerQuestionImage"
+      class="question-image"
+      src=""
+      alt="Question image"
+    >
+  </div>
 
   <div
     id="playerOptions"
@@ -729,6 +766,22 @@ function esc(v){
     );
 
 }
+
+function renderQuestionImage(question, imageId, wrapId){
+  const img = $(imageId);
+  const wrap = $(wrapId);
+
+  if(!img || !wrap) return;
+
+  if(question?.image_url){
+    img.src = question.image_url;
+    wrap.style.display = "block";
+  }else{
+    img.removeAttribute("src");
+    wrap.style.display = "none";
+  }
+}
+
 
 
 /* =========================================================
@@ -1441,6 +1494,12 @@ function hostShowQuestion(){
 
   $("hostQuestionText").textContent =
     getText(currentQuestion);
+
+  renderQuestionImage(
+    currentQuestion,
+    "hostQuestionImage",
+    "hostQuestionImageWrap"
+  );
 
 
   const options =
@@ -2217,6 +2276,12 @@ function showPlayerQuestion(){
       currentQuestion
     );
 
+  renderQuestionImage(
+    currentQuestion,
+    "playerQuestionImage",
+    "playerQuestionImageWrap"
+  );
+
 
   $("playerScore").textContent =
     player.score ?? 0;
@@ -2436,6 +2501,11 @@ async function submitAnswer(i){
         ? "✅ Correct! +10 points"
         : "❌ Not quite. +0 points"
     ) +
+
+    "<br><br>" +
+
+    '<strong>Correct Answer: </strong>' +
+    esc(correct) +
 
     "<br><br>" +
 
