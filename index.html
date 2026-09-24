@@ -1060,49 +1060,65 @@ button.menu-button:focus-visible,
 
 
 /* =========================================================
-   CANONICAL HOST-STYLE BUTTONS
-   Home + Host Setup + Join use the exact same button class.
+   ONE BUTTON SYSTEM — HOME / HOST / JOIN
+   Same rest, same hover, same active state.
    ========================================================= */
-button.host-style-button {
+button.host-style-button,
+button.host-style-button:visited {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  display: block !important;
   width: 100% !important;
-  margin-top: 10px !important;
+  min-height: 44px !important;
+  margin: 10px 0 0 !important;
   padding: 14px 18px !important;
-  border-radius: 10px !important;
   border: 1px solid rgba(181,138,58,.42) !important;
-  background: linear-gradient(180deg,#fffdf7,#f2e7d4) !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, #fffdf7 0%, #f2e7d4 100%) !important;
   color: #2b2520 !important;
-  font-weight: 700 !important;
+  font-family: inherit !important;
   font-size: 15px !important;
-  cursor: pointer !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
   box-shadow: 0 4px 12px rgba(54,42,27,.08) !important;
-  transition:
-    background-color .18s ease,
-    color .18s ease,
-    border-color .18s ease,
-    transform .12s ease,
-    box-shadow .18s ease !important;
+  cursor: pointer !important;
+  outline: none !important;
+  opacity: 1 !important;
   filter: none !important;
+  transform: none !important;
+  transition: background .18s ease, color .18s ease,
+              border-color .18s ease, box-shadow .18s ease,
+              transform .12s ease !important;
 }
 
-button.host-style-button:hover {
+/* THE ONLY hover color for these six menu/action buttons */
+button.host-style-button:hover,
+button.host-style-button.is-hovered {
   background: #252d59 !important;
   color: #ffffff !important;
   border-color: #252d59 !important;
-  box-shadow: 0 6px 16px rgba(37,45,89,.18) !important;
-  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37,45,89,.24) !important;
+  transform: translateY(-1px) !important;
   filter: none !important;
 }
 
-button.host-style-button:active {
-  background: #1d2448 !important;
+button.host-style-button:hover *,
+button.host-style-button.is-hovered * {
   color: #ffffff !important;
-  border-color: #1d2448 !important;
-  transform: translateY(1px);
 }
 
+/* Keyboard focus gets an outline, but does NOT fake a hover state. */
 button.host-style-button:focus-visible {
-  outline: 2px solid #252d59;
-  outline-offset: 2px;
+  outline: 2px solid #b58a3a !important;
+  outline-offset: 2px !important;
+}
+
+button.host-style-button:active {
+  background: #1b2447 !important;
+  color: #ffffff !important;
+  border-color: #1b2447 !important;
+  box-shadow: 0 4px 10px rgba(27,36,71,.22) !important;
+  transform: translateY(0) !important;
 }
 
 button.host-style-button:disabled {
@@ -1112,75 +1128,8 @@ button.host-style-button:disabled {
   box-shadow: none !important;
   transform: none !important;
   cursor: not-allowed !important;
+  opacity: .6 !important;
 }
-
-
-/* =========================================================
-   FINAL CANONICAL MENU BUTTONS
-   Home + Host Setup + Join use one identical component.
-   No page-specific button styling should override this.
-   ========================================================= */
-button.host-style-button,
-button.host-style-button:visited{
-  appearance:none !important;
-  -webkit-appearance:none !important;
-  width:100% !important;
-  min-height:44px !important;
-  margin:10px 0 0 !important;
-  padding:14px 18px !important;
-  border-radius:10px !important;
-  border:1px solid rgba(181,138,58,.42) !important;
-  outline:none !important;
-  background:linear-gradient(180deg,#fffdf7 0%,#f2e7d4 100%) !important;
-  color:#2b2520 !important;
-  font-family:inherit !important;
-  font-size:15px !important;
-  font-weight:700 !important;
-  line-height:1.2 !important;
-  box-shadow:0 4px 12px rgba(54,42,27,.08) !important;
-  cursor:pointer !important;
-  transform:none !important;
-  filter:none !important;
-  opacity:1 !important;
-  transition:background .18s ease,color .18s ease,border-color .18s ease,
-             box-shadow .18s ease,transform .12s ease !important;
-}
-
-button.host-style-button:hover,
-button.host-style-button:focus-visible{
-  background:#252d59 !important;
-  color:#ffffff !important;
-  border-color:#252d59 !important;
-  box-shadow:0 8px 20px rgba(37,45,89,.24) !important;
-  transform:translateY(-1px) !important;
-  filter:none !important;
-}
-
-button.host-style-button:active{
-  background:#1b2447 !important;
-  color:#ffffff !important;
-  border-color:#1b2447 !important;
-  box-shadow:0 4px 10px rgba(27,36,71,.22) !important;
-  transform:translateY(0) !important;
-}
-
-button.host-style-button:disabled{
-  background:#e9dfcf !important;
-  color:#8b8175 !important;
-  border-color:#d8cbb8 !important;
-  box-shadow:none !important;
-  transform:none !important;
-  cursor:not-allowed !important;
-  opacity:.6 !important;
-}
-
-/* Make sure text inside the shared button always follows the same state. */
-button.host-style-button:hover *,
-button.host-style-button:focus-visible *,
-button.host-style-button:active *{
-  color:#ffffff !important;
-}
-
 </style>
 </head>
 
@@ -3548,6 +3497,31 @@ function refreshLeaderboardAnimation(){
   candidates.forEach(animateLeaderboardRows);
 }
 
+
+<script>
+/* ONE hover system for Home, Host Setup, and Join. */
+document.querySelectorAll('button.host-style-button').forEach(function (button) {
+  button.addEventListener('pointerenter', function () {
+    if (!button.disabled) button.classList.add('is-hovered');
+  });
+  button.addEventListener('pointerleave', function () {
+    button.classList.remove('is-hovered');
+  });
+});
+
+/* Buttons are rendered statically, but this also covers buttons created later. */
+document.addEventListener('pointerover', function (event) {
+  const button = event.target.closest('button.host-style-button');
+  if (button && !button.disabled) button.classList.add('is-hovered');
+});
+document.addEventListener('pointerout', function (event) {
+  const button = event.target.closest('button.host-style-button');
+  if (!button) return;
+  if (!event.relatedTarget || !button.contains(event.relatedTarget)) {
+    button.classList.remove('is-hovered');
+  }
+});
 </script>
+
 </body>
 </html>
