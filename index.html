@@ -373,7 +373,7 @@ label{
 
 <body>
 
-<button id="musicControl" class="music-control" onclick="toggleMusic()">🔇 Music Off</button>
+<button id="musicControl" class="music-control on" onclick="toggleMusic()">🔊 Music On</button>
 
 <div class="wrap">
 
@@ -563,7 +563,7 @@ label{
   <input
     id="nickname"
     maxlength="24"
-    placeholder="Full Name"
+    placeholder="Your Full Name"
   >
 
   <button onclick="joinGame()">
@@ -728,8 +728,8 @@ let answerLocked = false;
 let playerWatcher = null;
 
 // Question timer settings
-const QUESTION_TIME = 10;
-const LEADERBOARD_TIME = 3;
+const QUESTION_TIME = 20;
+const LEADERBOARD_TIME = 10;
 let hostTimerInterval = null;
 let playerTimerInterval = null;
 let isAdvancingQuestion = false;
