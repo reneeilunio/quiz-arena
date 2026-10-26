@@ -368,6 +368,9 @@ label{
   .music-control{top:10px;right:10px;min-width:0;font-size:12px;padding:8px 11px;}
 }
 
+
+.host-controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.host-controls button{flex:1;min-width:180px}.faq-panel{margin-top:14px;padding:14px;background:#1a2140;border-radius:12px;text-align:left;color:#eef2ff}.faq-panel h3{margin:0 0 8px;font-size:17px}.faq-panel details{padding:8px 0;border-top:1px solid #343d60}.faq-panel summary{cursor:pointer;font-weight:700}.faq-panel p{margin:7px 0 2px;color:#cbd5e1;font-size:14px}
+.rationale-panel{margin-top:14px;padding:16px 18px;background:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;text-align:left;color:#6b21a8;box-shadow:0 2px 5px rgba(0,0,0,.12)}.rationale-panel h3{margin:0 0 8px;font-size:16px;color:#6b21a8}.rationale-panel p{margin:0;color:#6b21a8;font-size:14px;line-height:1.5;white-space:pre-wrap}.rationale-panel.hidden{display:none}
 </style>
 </head>
 
@@ -520,9 +523,11 @@ label{
     Waiting for players...
   </div>
 
-  <button onclick="showHostLeaderboardThenNext()">
-    SHOW LEADERBOARD
-  </button>
+  <div class="host-controls">
+    <button id="hostPauseButton" class="secondary" onclick="toggleHostPause()">⏸ PAUSE GAME</button>
+    <button onclick="showHostLeaderboardThenNext()">SHOW LEADERBOARD</button>
+  </div>
+  <div class="small" id="hostPauseMsg" aria-live="polite"></div>
 
 </div>
 
@@ -644,7 +649,19 @@ label{
     class="answer-grid"
   ></div>
 
+  <div id="playerPauseNotice" class="msg hidden">⏸ The host paused the game. Please wait for the host to resume.</div>
   <div id="playerMsg"></div>
+  <section id="playerRationale" class="rationale-panel hidden" aria-live="polite">
+    <h3>💡 Teacher's Explanation / Rationale:</h3>
+    <p id="playerRationaleText"></p>
+  </section>
+  <section class="faq-panel" aria-label="Frequently asked questions">
+    <h3>Quick FAQ</h3>
+    <details><summary>How do I earn points?</summary><p>Choose the correct answer before the timer runs out.</p></details>
+    <details><summary>Can I change my answer?</summary><p>No. Once you submit an answer, it is locked for that question.</p></details>
+    <details><summary>Why is the game paused?</summary><p>The host may pause the game. Wait here until the host resumes.</p></details>
+    <details><summary>What happens when time runs out?</summary><p>Your answer is locked and the game moves on when the host advances.</p></details>
+  </section>
 
 </div>
 
@@ -733,6 +750,7 @@ const LEADERBOARD_TIME = 10;
 let hostTimerInterval = null;
 let playerTimerInterval = null;
 let isAdvancingQuestion = false;
+let hostGamePaused = false;
 let leaderboardTimeout = null;
 let leaderboardInterval = null;
 
@@ -859,14 +877,22 @@ function scheduleMusicStep(){
   musicStep++;
 }
 
-function startMusic(){
+async function startMusic(){
   if(!ensureAudio()) return;
-  musicEnabled = true;
-  const button = $("musicControl");
-  if(button){ button.textContent = "🔊 Music On"; button.classList.add("on"); }
-  if(musicTimer) clearInterval(musicTimer);
-  scheduleMusicStep();
-  musicTimer = setInterval(scheduleMusicStep, 240);
+  try{
+    // Browsers only allow audible playback after a user gesture. Wait for
+    // the audio context to resume before scheduling the first music notes.
+    if(audioCtx.state === "suspended") await audioCtx.resume();
+    if(audioCtx.state !== "running") return;
+    musicEnabled = true;
+    const button = $("musicControl");
+    if(button){ button.textContent = "🔊 Music On"; button.classList.add("on"); }
+    if(musicTimer) clearInterval(musicTimer);
+    scheduleMusicStep();
+    musicTimer = setInterval(scheduleMusicStep, 240);
+  }catch(e){
+    console.warn("Could not start music:", e);
+  }
 }
 
 function stopMusic(){
@@ -1173,6 +1199,9 @@ async function startGame(){
 
 
   currentIndex = 0;
+  hostGamePaused = false;
+  $("hostPauseButton").textContent = "⏸ PAUSE GAME";
+  $("hostPauseMsg").textContent = "";
 
 
   /*
@@ -1401,6 +1430,7 @@ function startHostTimer(){
 
   hostTimerInterval = setInterval(async () => {
 
+    if(hostGamePaused) return;
     remaining--;
 
     if(el){
@@ -1440,6 +1470,7 @@ function startPlayerTimer(){
 
   playerTimerInterval = setInterval(async () => {
 
+    if(game?.status === "Paused") return;
     remaining--;
 
     if(el){
@@ -1664,6 +1695,21 @@ function hostShowQuestion(){
 
 }
 
+
+async function toggleHostPause(){
+  if(!game) return;
+  const shouldPause = !hostGamePaused;
+  const newStatus = shouldPause ? "Paused" : "Playing";
+  const { data, error } = await sb.from("games").update({status:newStatus}).eq("id",game.id).select().single();
+  if(error){
+    msg("hostPauseMsg", "Could not update game status: " + esc(error.message));
+    return;
+  }
+  game = data;
+  hostGamePaused = shouldPause;
+  $("hostPauseButton").textContent = shouldPause ? "▶ RESUME GAME" : "⏸ PAUSE GAME";
+  $("hostPauseMsg").textContent = shouldPause ? "Game paused. The question timer is on hold." : "Game resumed.";
+}
 
 /* =========================================================
    HOST ANSWER COUNT
@@ -1906,10 +1952,6 @@ async function endGame(){
 
 async function joinGame(){
 
-  // User clicked JOIN GAME, which unlocks browser audio for the player.
-  ensureAudio();
-  startMusic();
-
   const pin =
     $("joinPin")
       .value
@@ -1935,6 +1977,8 @@ async function joinGame(){
 
   }
 
+  // Start music from the valid Join button gesture, then continue joining.
+  startMusic();
 
   const {
     data:g,
@@ -2168,6 +2212,15 @@ async function handlePlayerGameUpdate(
   game =
     newGame;
 
+  if(game.status === "Paused"){
+    clearPlayerTimer();
+    const pauseNotice = document.getElementById("playerPauseNotice");
+    if(pauseNotice) pauseNotice.classList.remove("hidden");
+  } else if(game.status === "Playing") {
+    const pauseNotice = document.getElementById("playerPauseNotice");
+    if(pauseNotice) pauseNotice.classList.add("hidden");
+    if(oldStatus === "Paused") startPlayerTimer();
+  }
 
   const newQuestion =
     Number(
@@ -2457,6 +2510,8 @@ function showPlayerQuestion(){
 
   $("playerMsg").innerHTML =
     "";
+  $("playerRationale").classList.add("hidden");
+  $("playerRationaleText").textContent = "";
 
 
   /*
@@ -2639,20 +2694,22 @@ async function submitAnswer(i){
   else playWrongSound();
 
 
-  $("playerMsg").innerHTML =
-    '<div class="msg">' +
+  // Replace the old correct/incorrect feedback message with the rationale box.
+  // The score still updates above; the player sees the teacher's explanation instead.
+  $("playerMsg").innerHTML = "";
 
-    (
-      isCorrect
-        ? "✅ Correct! +10 points"
-        : "❌ Not quite. +0 points"
-    ) +
-
-    "<br><br>" +
-
-    "Waiting for the host to move to the next question..." +
-
-    "</div>";
+  // Show the teacher's explanation only after the player submits an answer.
+  // Supports common column names so the existing questions table can be used.
+  const rationale = String(
+    currentQuestion.explanation ??
+    currentQuestion.rationale ??
+    currentQuestion.teacher_explanation ??
+    currentQuestion.answer_explanation ??
+    ""
+  ).trim();
+  $("playerRationaleText").textContent = rationale ||
+    "No teacher explanation has been added for this question yet.";
+  $("playerRationale").classList.remove("hidden");
 
 
   /*
