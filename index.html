@@ -370,7 +370,7 @@ label{
 
 
 .host-controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.host-controls button{flex:1;min-width:180px}.faq-panel{margin-top:14px;padding:14px;background:#1a2140;border-radius:12px;text-align:left;color:#eef2ff}.faq-panel h3{margin:0 0 8px;font-size:17px}.faq-panel details{padding:8px 0;border-top:1px solid #343d60}.faq-panel summary{cursor:pointer;font-weight:700}.faq-panel p{margin:7px 0 2px;color:#cbd5e1;font-size:14px}
-.rationale-panel{margin-top:14px;padding:16px 18px;background:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;text-align:left;color:#6b21a8;box-shadow:0 2px 5px rgba(0,0,0,.12)}.rationale-panel h3{margin:0 0 8px;font-size:16px;color:#6b21a8}.rationale-panel p{margin:0;color:#6b21a8;font-size:14px;line-height:1.5;white-space:pre-wrap}.rationale-panel.hidden{display:none}
+.rationale-wrap{display:flex;justify-content:center;margin-top:12px}.rationale-icon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid #e9d5ff;background:#faf5ff;color:#6b21a8;font-size:23px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.18);transition:transform .15s}.rationale-icon:hover{transform:scale(1.08)}.rationale-panel{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:14px 16px;background:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;text-align:left;color:#6b21a8;box-shadow:0 2px 5px rgba(0,0,0,.12)}.rationale-bulb{flex:0 0 auto;font-size:18px;line-height:1.4}.rationale-panel p{margin:0;color:#6b21a8;font-size:14px;line-height:1.5;white-space:pre-wrap}.rationale-content{display:flex;flex-direction:column;gap:6px}.rationale-content p:first-child{font-weight:500}.rationale-panel.hidden{display:none}
 </style>
 </head>
 
@@ -563,7 +563,7 @@ label{
     placeholder=""
   >
 
-  <label>Nickname</label>
+  <label>Name</label>
 
   <input
     id="nickname"
@@ -652,8 +652,11 @@ label{
   <div id="playerPauseNotice" class="msg hidden">⏸ The host paused the game. Please wait for the host to resume.</div>
   <div id="playerMsg"></div>
   <section id="playerRationale" class="rationale-panel hidden" aria-live="polite">
-    <h3>💡 Teacher's Explanation / Rationale:</h3>
-    <p id="playerRationaleText"></p>
+    <span class="rationale-bulb" aria-hidden="true">💡</span>
+    <div class="rationale-content">
+      <p><strong>Correct Answer:</strong> <span id="playerCorrectAnswer"></span></p>
+      <p id="playerRationaleText"></p>
+    </div>
   </section>
   <section class="faq-panel" aria-label="Frequently asked questions">
     <h3>Quick FAQ</h3>
@@ -2700,6 +2703,20 @@ async function submitAnswer(i){
 
   // Show the teacher's explanation only after the player submits an answer.
   // Supports common column names so the existing questions table can be used.
+  const optionsForRationale = getOptions(currentQuestion);
+  const rawCorrectAnswer = getCorrect(currentQuestion);
+  let displayedCorrectAnswer = rawCorrectAnswer;
+  const correctNorm = normalizeAnswer(rawCorrectAnswer);
+  const letterIndex = { a: 0, b: 1, c: 2, d: 3 };
+  if (Object.prototype.hasOwnProperty.call(letterIndex, correctNorm)) {
+    displayedCorrectAnswer = optionsForRationale[letterIndex[correctNorm]] ?? rawCorrectAnswer;
+  } else if (/^[0-3]$/.test(correctNorm)) {
+    displayedCorrectAnswer = optionsForRationale[Number(correctNorm)] ?? rawCorrectAnswer;
+  } else if (/^[1-4]$/.test(correctNorm)) {
+    displayedCorrectAnswer = optionsForRationale[Number(correctNorm) - 1] ?? rawCorrectAnswer;
+  }
+  $("playerCorrectAnswer").textContent = displayedCorrectAnswer || "Not available";
+
   const rationale = String(
     currentQuestion.explanation ??
     currentQuestion.rationale ??
@@ -2707,8 +2724,8 @@ async function submitAnswer(i){
     currentQuestion.answer_explanation ??
     ""
   ).trim();
-  $("playerRationaleText").textContent = rationale ||
-    "No teacher explanation has been added for this question yet.";
+  $("playerRationaleText").textContent = rationale;
+  // Automatically show the lightbulb, correct answer, and explanation after every submitted answer.
   $("playerRationale").classList.remove("hidden");
 
 
