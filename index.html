@@ -163,7 +163,15 @@ label{
 }
 
 .timer.warning{
-  animation:pulse .6s infinite alternate;
+  color:#ffffff;
+  background:#d7193f;
+  box-shadow:0 0 0 2px rgba(255,70,90,.35), 0 0 18px rgba(255,35,65,.65);
+  animation:timerRedPulse .45s infinite alternate;
+}
+
+@keyframes timerRedPulse{
+  from{transform:scale(1); background:#d7193f;}
+  to{transform:scale(1.08); background:#ff173d;}
 }
 
 @keyframes pulse{
@@ -759,7 +767,8 @@ let playerWatcher = null;
 
 // Question timer settings
 const QUESTION_TIME = 20;
-const LEADERBOARD_TIME = 10;
+const LEADERBOARD_TIME = 5;
+const RESULT_DISPLAY_TIME = 5;
 let hostTimerInterval = null;
 let playerTimerInterval = null;
 let hostRemaining = QUESTION_TIME;
@@ -1497,14 +1506,20 @@ function startPlayerTimer(reset = false){
   const el = $("playerTimer");
   if(el){
     el.textContent = Math.max(playerRemaining, 0);
-    el.classList.toggle("warning", playerRemaining <= 5);
+    el.classList.toggle("warning", playerRemaining <= 5 && playerRemaining > 0);
   }
   playerTimerInterval = setInterval(async () => {
     if(game?.status === "Paused") return;
     playerRemaining--;
     if(el){
       el.textContent = Math.max(playerRemaining, 0);
-      if(playerRemaining <= 5) el.classList.add("warning");
+      if(playerRemaining <= 5 && playerRemaining > 0){
+        el.classList.add("warning");
+        // One short beep for each of the final five seconds (5, 4, 3, 2, 1).
+        tone(880, 0.11, "square", 0.075);
+      } else {
+        el.classList.remove("warning");
+      }
     }
     if(playerRemaining <= 0){
       clearPlayerTimer();
@@ -1580,6 +1595,10 @@ async function showHostLeaderboardThenNext(){
   clearHostTimer();
   clearLeaderboardTimers();
 
+  // Keep the live question visible for 5 seconds after the timer reaches zero.
+  // This gives everyone time to see the result and explanation before standings.
+  await new Promise(resolve => setTimeout(resolve, RESULT_DISPLAY_TIME * 1000));
+
   // Give the final answer/score update a moment to reach Supabase.
   await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -1634,6 +1653,9 @@ async function showHostLeaderboardThenNext(){
 async function showPlayerLeaderboard(){
 
   clearPlayerTimer();
+
+  // Keep the question, result, and explanation visible for 5 seconds after time expires.
+  await new Promise(resolve => setTimeout(resolve, RESULT_DISPLAY_TIME * 1000));
 
   // Give the player's score update a moment to settle.
   await new Promise(resolve => setTimeout(resolve, 300));
