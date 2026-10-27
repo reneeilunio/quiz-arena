@@ -523,6 +523,14 @@ label{
     Waiting for players...
   </div>
 
+  <section id="hostRationale" class="rationale-panel" aria-live="polite">
+    <span class="rationale-bulb" aria-hidden="true">💡</span>
+    <div class="rationale-content">
+      <p><strong>Correct Answer:</strong> <span id="hostCorrectAnswer"></span></p>
+      <p id="hostRationaleText"></p>
+    </div>
+  </section>
+
   <div class="host-controls">
     <button id="hostPauseButton" class="secondary" onclick="toggleHostPause()">⏸ PAUSE GAME</button>
     <button onclick="showHostLeaderboardThenNext()">SHOW LEADERBOARD</button>
@@ -563,7 +571,7 @@ label{
     placeholder=""
   >
 
-  <label>Name</label>
+  <label>Nickname</label>
 
   <input
     id="nickname"
@@ -742,6 +750,8 @@ let questions = [];
 let currentIndex = 0;
 
 let currentQuestion = null;
+let lastRenderedQuestionIndex = null;
+const playerAnsweredQuestionIndexes = new Set();
 
 let answerLocked = false;
 
@@ -752,6 +762,8 @@ const QUESTION_TIME = 20;
 const LEADERBOARD_TIME = 10;
 let hostTimerInterval = null;
 let playerTimerInterval = null;
+let hostRemaining = QUESTION_TIME;
+let playerRemaining = QUESTION_TIME;
 let isAdvancingQuestion = false;
 let hostGamePaused = false;
 let leaderboardTimeout = null;
@@ -1418,36 +1430,27 @@ function clearLeaderboardTimers(){
 
 }
 
-function startHostTimer(){
-
+function startHostTimer(reset = false){
   clearHostTimer();
   clearLeaderboardTimers();
-
-  let remaining = QUESTION_TIME;
+  if(reset) hostRemaining = Number(currentQuestion?.time_limit) || QUESTION_TIME;
   const el = $("hostTimer");
-
   if(el){
-    el.textContent = remaining;
-    el.classList.remove("warning");
+    el.textContent = Math.max(hostRemaining, 0);
+    el.classList.toggle("warning", hostRemaining <= 5);
   }
-
   hostTimerInterval = setInterval(async () => {
-
-    if(hostGamePaused) return;
-    remaining--;
-
+    if(hostGamePaused || game?.status === "Paused") return;
+    hostRemaining--;
     if(el){
-      el.textContent = Math.max(remaining, 0);
-      if(remaining <= 5) el.classList.add("warning");
+      el.textContent = Math.max(hostRemaining, 0);
+      if(hostRemaining <= 5) el.classList.add("warning");
     }
-
-    if(remaining <= 0){
+    if(hostRemaining <= 0){
       clearHostTimer();
       await showHostLeaderboardThenNext();
     }
-
   }, 1000);
-
 }
 
 function clearPlayerTimer(){
@@ -1459,36 +1462,58 @@ function clearPlayerTimer(){
 
 }
 
-function startPlayerTimer(){
-
-  clearPlayerTimer();
-
-  let remaining = QUESTION_TIME;
-  const el = $("playerTimer");
-
-  if(el){
-    el.textContent = remaining;
-    el.classList.remove("warning");
+function revealPlayerRationale(){
+  if(!currentQuestion) return;
+  const options = getOptions(currentQuestion);
+  const rawCorrectAnswer = getCorrect(currentQuestion);
+  let displayedCorrectAnswer = rawCorrectAnswer;
+  const correctNorm = normalizeAnswer(rawCorrectAnswer);
+  const letterIndex = { a: 0, b: 1, c: 2, d: 3 };
+  if (Object.prototype.hasOwnProperty.call(letterIndex, correctNorm)) {
+    displayedCorrectAnswer = options[letterIndex[correctNorm]] ?? rawCorrectAnswer;
+  } else if (/^[0-3]$/.test(correctNorm)) {
+    displayedCorrectAnswer = options[Number(correctNorm)] ?? rawCorrectAnswer;
+  } else if (/^[1-4]$/.test(correctNorm)) {
+    displayedCorrectAnswer = options[Number(correctNorm) - 1] ?? rawCorrectAnswer;
   }
+  $("playerCorrectAnswer").textContent = displayedCorrectAnswer || "Not available";
+  $("playerRationaleText").textContent = String(
+    currentQuestion.explanation ?? currentQuestion.rationale ?? currentQuestion.teacher_explanation ?? currentQuestion.answer_explanation ?? ""
+  ).trim();
+  $("playerRationale").classList.remove("hidden");
+}
 
+function setPlayerAnswerButtonsDisabled(disabled){
+  const buttons = document.querySelectorAll('#playerOptions button');
+  buttons.forEach(button => {
+    // Never unlock answers after a player has already submitted one.
+    button.disabled = disabled || answerLocked;
+  });
+}
+
+function startPlayerTimer(reset = false){
+  clearPlayerTimer();
+  if(reset) playerRemaining = Number(currentQuestion?.time_limit) || QUESTION_TIME;
+  const el = $("playerTimer");
+  if(el){
+    el.textContent = Math.max(playerRemaining, 0);
+    el.classList.toggle("warning", playerRemaining <= 5);
+  }
   playerTimerInterval = setInterval(async () => {
-
     if(game?.status === "Paused") return;
-    remaining--;
-
+    playerRemaining--;
     if(el){
-      el.textContent = Math.max(remaining, 0);
-      if(remaining <= 5) el.classList.add("warning");
+      el.textContent = Math.max(playerRemaining, 0);
+      if(playerRemaining <= 5) el.classList.add("warning");
     }
-
-    if(remaining <= 0){
+    if(playerRemaining <= 0){
       clearPlayerTimer();
       answerLocked = true;
+      setPlayerAnswerButtonsDisabled(true);
+      revealPlayerRationale();
       await showPlayerLeaderboard();
     }
-
   }, 1000);
-
 }
 
 async function fetchLeaderboard(){
@@ -1634,6 +1659,21 @@ async function showPlayerLeaderboard(){
 
 }
 
+function renderHostRationale(question){
+  if(!question) return;
+  const options = getOptions(question);
+  const raw = getCorrect(question);
+  const normalized = normalizeAnswer(raw);
+  const letters = {a:0,b:1,c:2,d:3};
+  let answer = raw;
+  if(Object.prototype.hasOwnProperty.call(letters, normalized)) answer = options[letters[normalized]] ?? raw;
+  else if(/^[0-3]$/.test(normalized)) answer = options[Number(normalized)] ?? raw;
+  else if(/^[1-4]$/.test(normalized)) answer = options[Number(normalized)-1] ?? raw;
+  $("hostCorrectAnswer").textContent = answer || "Not available";
+  $("hostRationaleText").textContent = String(question.explanation ?? question.rationale ?? question.teacher_explanation ?? question.answer_explanation ?? "").trim();
+  $("hostRationale").classList.remove("hidden");
+}
+
 /* =========================================================
    HOST SHOW QUESTION
 ========================================================= */
@@ -1689,12 +1729,13 @@ function hostShowQuestion(){
 
 
   loadAnswerCount();
+  renderHostRationale(currentQuestion);
 
   // Actually switch the host from the lobby to the live question.
   show("hostQuestion");
 
   // Automatically move to the next question when time expires.
-  startHostTimer();
+  startHostTimer(true);
 
 }
 
@@ -1710,6 +1751,11 @@ async function toggleHostPause(){
   }
   game = data;
   hostGamePaused = shouldPause;
+  if(shouldPause){
+    clearHostTimer();
+  } else if(hostRemaining > 0) {
+    startHostTimer(false);
+  }
   $("hostPauseButton").textContent = shouldPause ? "▶ RESUME GAME" : "⏸ PAUSE GAME";
   $("hostPauseMsg").textContent = shouldPause ? "Game paused. The question timer is on hold." : "Game resumed.";
 }
@@ -1842,7 +1888,7 @@ async function nextHostQuestion(fromTimer = false){
 
     currentIndex--;
     isAdvancingQuestion = false;
-    startHostTimer();
+    startHostTimer(false);
 
     return;
 
@@ -2053,8 +2099,13 @@ async function joinGame(){
 
 
   game = g;
-
   player = p;
+  currentIndex = 0;
+  currentQuestion = null;
+  lastRenderedQuestionIndex = null;
+  playerAnsweredQuestionIndexes.clear();
+  answerLocked = false;
+  playerRemaining = QUESTION_TIME;
 
 
   $("playerPin").textContent =
@@ -2217,12 +2268,17 @@ async function handlePlayerGameUpdate(
 
   if(game.status === "Paused"){
     clearPlayerTimer();
+    setPlayerAnswerButtonsDisabled(true);
     const pauseNotice = document.getElementById("playerPauseNotice");
     if(pauseNotice) pauseNotice.classList.remove("hidden");
   } else if(game.status === "Playing") {
     const pauseNotice = document.getElementById("playerPauseNotice");
     if(pauseNotice) pauseNotice.classList.add("hidden");
-    if(oldStatus === "Paused") startPlayerTimer();
+    if(oldStatus === "Paused") {
+      // Resume the existing question only: never reload it or clear answerLocked.
+      setPlayerAnswerButtonsDisabled(answerLocked);
+      if(playerRemaining > 0) startPlayerTimer(false);
+    }
   }
 
   const newQuestion =
@@ -2237,7 +2293,8 @@ async function handlePlayerGameUpdate(
 
   if(
     game.status === "Playing" &&
-    oldStatus !== "Playing"
+    oldStatus !== "Playing" &&
+    oldStatus !== "Paused"
   ){
 
     console.log(
@@ -2416,6 +2473,19 @@ function showPlayerQuestion(){
     currentIndex + 1
   );
 
+  // Guard against duplicate realtime + polling updates rendering the same
+  // question again. A resume must never reset its timer or answer lock.
+  if (lastRenderedQuestionIndex === currentIndex && currentQuestion) {
+    console.log("PLAYER: Same question already rendered; preserving timer and answer lock.");
+    if (game?.status === "Paused") {
+      clearPlayerTimer();
+      setPlayerAnswerButtonsDisabled(true);
+    } else if (game?.status === "Playing" && playerRemaining > 0 && !playerTimerInterval) {
+      setPlayerAnswerButtonsDisabled(answerLocked);
+      startPlayerTimer(false);
+    }
+    return;
+  }
 
   if(
     currentIndex >=
@@ -2441,8 +2511,8 @@ function showPlayerQuestion(){
   currentQuestion =
     questions[currentIndex];
 
-
-  answerLocked = false;
+  lastRenderedQuestionIndex = currentIndex;
+  answerLocked = playerAnsweredQuestionIndexes.has(currentIndex);
 
 
   const options =
@@ -2525,9 +2595,9 @@ function showPlayerQuestion(){
 
   show("playerQuestion");
 
-  // Display a matching countdown for the player.
-  // The host timer is authoritative and advances the shared game.
-  startPlayerTimer();
+  // A newly displayed question gets a fresh timer. Pausing/resuming does not
+  // call showPlayerQuestion(), so it preserves the remaining time and answer lock.
+  startPlayerTimer(true);
 
 }
 
@@ -2538,11 +2608,12 @@ function showPlayerQuestion(){
 
 async function submitAnswer(i){
 
-  if(answerLocked)
+  if(answerLocked || game?.status === "Paused")
     return;
 
-
   answerLocked = true;
+  playerAnsweredQuestionIndexes.add(currentIndex);
+  setPlayerAnswerButtonsDisabled(true);
 
 
   const options =
@@ -2586,6 +2657,31 @@ async function submitAnswer(i){
       ? 10
       : 0;
 
+  // Show feedback immediately on the player's screen, without waiting for
+  // the database request to finish. Keep all answer buttons locked.
+  const answerButtons = document.querySelectorAll("#playerOptions button");
+  let correctIndex = -1;
+  options.forEach((option, index) => {
+    if (isAnswerCorrect(options, index, correct)) correctIndex = index;
+  });
+
+  answerButtons.forEach((button, j) => {
+    button.disabled = true;
+    if (j === i) button.classList.add(isCorrect ? "correct" : "wrong");
+    if (!isCorrect && j === correctIndex) button.classList.add("correct");
+  });
+
+  if (isCorrect) {
+    $("playerMsg").innerHTML = '<div class="msg">✅ Correct! Great job!</div>';
+    playCorrectSound();
+  } else {
+    const correctLabel = correctIndex >= 0 ? options[correctIndex] : String(correct);
+    $("playerMsg").innerHTML = '<div class="msg">❌ Not quite. Correct answer: <strong>' + esc(correctLabel) + '</strong></div>';
+    playWrongSound();
+  }
+
+  // Show the correct answer and explanation immediately after selection.
+  revealPlayerRationale();
 
   const {
     error
@@ -2627,6 +2723,7 @@ async function submitAnswer(i){
 
 
     answerLocked = false;
+    setPlayerAnswerButtonsDisabled(game?.status !== "Playing");
 
     return;
 
@@ -2661,72 +2758,10 @@ async function submitAnswer(i){
     );
 
 
-  /*
-    Disable answer buttons
-  */
+  $("playerScore").textContent = newScore;
 
-  document
-    .querySelectorAll(
-      "#playerOptions button"
-    )
-    .forEach(
-      (button,j) => {
-
-        button.disabled =
-          true;
-
-
-        if(j === i){
-
-          button.classList.add(
-            isCorrect
-              ? "correct"
-              : "wrong"
-          );
-
-        }
-
-      }
-    );
-
-
-  $("playerScore").textContent =
-    newScore;
-
-  if(isCorrect) playCorrectSound();
-  else playWrongSound();
-
-
-  // Replace the old correct/incorrect feedback message with the rationale box.
-  // The score still updates above; the player sees the teacher's explanation instead.
-  $("playerMsg").innerHTML = "";
-
-  // Show the teacher's explanation only after the player submits an answer.
-  // Supports common column names so the existing questions table can be used.
-  const optionsForRationale = getOptions(currentQuestion);
-  const rawCorrectAnswer = getCorrect(currentQuestion);
-  let displayedCorrectAnswer = rawCorrectAnswer;
-  const correctNorm = normalizeAnswer(rawCorrectAnswer);
-  const letterIndex = { a: 0, b: 1, c: 2, d: 3 };
-  if (Object.prototype.hasOwnProperty.call(letterIndex, correctNorm)) {
-    displayedCorrectAnswer = optionsForRationale[letterIndex[correctNorm]] ?? rawCorrectAnswer;
-  } else if (/^[0-3]$/.test(correctNorm)) {
-    displayedCorrectAnswer = optionsForRationale[Number(correctNorm)] ?? rawCorrectAnswer;
-  } else if (/^[1-4]$/.test(correctNorm)) {
-    displayedCorrectAnswer = optionsForRationale[Number(correctNorm) - 1] ?? rawCorrectAnswer;
-  }
-  $("playerCorrectAnswer").textContent = displayedCorrectAnswer || "Not available";
-
-  const rationale = String(
-    currentQuestion.explanation ??
-    currentQuestion.rationale ??
-    currentQuestion.teacher_explanation ??
-    currentQuestion.answer_explanation ??
-    ""
-  ).trim();
-  $("playerRationaleText").textContent = rationale;
-  // Automatically show the lightbulb, correct answer, and explanation after every submitted answer.
-  $("playerRationale").classList.remove("hidden");
+  // Keep the answer locked after submission.
+  setPlayerAnswerButtonsDisabled(true);
 
 
   /*
